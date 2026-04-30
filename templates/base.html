@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Scheduler</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Shift Scheduler</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/shifts">Shifts</a></li>
+                <li><a href="/employees">Employees</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {{ block "content" . }}{{ end }}
+    </main>
+
+    <footer>
+    </footer>
+
+    <script src="/static/js/scripts.js"></script>
+</html>

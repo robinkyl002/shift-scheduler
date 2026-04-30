@@ -1,9 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"net/http"
 )
 
 func main() {
-	fmt.Println("Hello, Shift Scheduler!")
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", home)
+	http.ListenAndServe(":8081", mux)
 }
