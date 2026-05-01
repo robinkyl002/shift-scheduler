@@ -7,7 +7,7 @@ html {
     background-color: #002e5d;
     color: white;
     margin: 0;
-    padding: 0 10px ;
+    padding: 0 20px ;
     text-align: left;
     font-weight: 400;
     display: flex;
@@ -22,9 +22,9 @@ html {
     color: white;
 }
 
-/* #app-title {
-    display: inline-block;
-} */
+#app-title {
+    padding-left: 5px;
+}
 
 header, body {
     margin: 0;
