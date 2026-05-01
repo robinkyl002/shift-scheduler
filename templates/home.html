@@ -8,7 +8,11 @@
         <div id="homepage-description">
             <p>Here users can submit and view their schedules and administrators can manage them.</p>
             <p>To get started, please login</p>
-            <button id="login-button" hx-get="/login" hx-target="main" hx-push-url="true">Sign In</button>
+            <a id="login-button"
+                href="/login"
+                hx-get="/login" 
+                hx-target="main" 
+                hx-push-url="true">Sign In</a>
         </div>
     </div>
 {{end}}

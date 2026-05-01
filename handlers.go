@@ -11,7 +11,6 @@ func home(w http.ResponseWriter, r *http.Request) {
 		"./templates/base.html",
 		"./components/navbar.html",
 		"./templates/home.html",
-		"./static/css/home.css",
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -20,7 +19,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.Execute(w, nil)
+	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		log.Print(err.Error())
 		return
@@ -41,7 +40,12 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	if r.Header.Get("HX-Request") == "true" {
+		err = ts.ExecuteTemplate(w, "content", nil)
+	} else {
+		err = ts.ExecuteTemplate(w, "base", nil)
+	}
+
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
