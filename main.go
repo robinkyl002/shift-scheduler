@@ -9,6 +9,8 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", home)
+	mux.HandleFunc("GET /login", loginPage)
+	mux.HandleFunc("POST /login", login)
 
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
