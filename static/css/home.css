@@ -1,0 +1,28 @@
+#home-content {
+    padding-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#homepage-title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+#homepage-description {
+    text-align: center;
+    max-width: 600px;
+
+}
+
+#login-button {
+    background-color: #0047BA;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+}

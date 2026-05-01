@@ -1,5 +1,14 @@
+{{define "head"}}
+    <link rel="stylesheet" href="./static/css/home.css">
+{{end}}
+
 {{define "content"}}
-    <h1>Welcome to the Shift Scheduler!</h1>
-    <p>To get started, please login</p>
-    <button id="login-button">Sign In</button>
+    <div id="home-content">
+        <h1 id="homepage-title">Welcome to the Shift Scheduler!</h1>
+        <div id="homepage-description">
+            <p>Here users can submit and view their schedules and administrators can manage them.</p>
+            <p>To get started, please login</p>
+            <button id="login-button" hx-get="/login" hx-target="main" hx-push-url="true">Sign In</button>
+        </div>
+    </div>
 {{end}}
