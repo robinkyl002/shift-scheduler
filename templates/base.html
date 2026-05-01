@@ -4,18 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shift Scheduler</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./static/css/styles.css">
 </head>
 <body>
     <header>
         <h1>Shift Scheduler</h1>
-        <nav>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/shifts">Shifts</a></li>
-                <li><a href="/employees">Employees</a></li>
-            </ul>
-        </nav>
+        {{template "nav" .}}
     </header>
 
     <main>
@@ -25,5 +22,5 @@
     <footer>
     </footer>
 
-    <script src="/static/js/scripts.js"></script>
+    <script src="/static/htmx.min.js"></script>
 </html>

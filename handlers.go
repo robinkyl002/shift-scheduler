@@ -9,6 +9,7 @@ import (
 func home(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./templates/base.html",
+		"./components/navbar.html",
 	}
 
 	ts, err := template.ParseFiles(files...)
