@@ -14,12 +14,17 @@ nav {
     ul {
         list-style-type: none;
         margin: 0;
-        padding: 0;
+        padding: 10px 20px;
         display: block;
         gap: 20px;
         li {
             display: inline-block;
             margin-right: 20px;
+            a {
+                text-decoration: none;
+                color: #002e5d;
+                font-weight: bold;
+            }
         }
 
     }
