@@ -33,5 +33,5 @@ go.work.sum
 
 .codex
 
-# Plans
-plans/*
+# Plan files
+/plans/
