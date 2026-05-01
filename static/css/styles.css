@@ -3,6 +3,23 @@ html {
     color: #141414
 }
 
+header, body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.16);
+    border-bottom: 1px solid #ddd;
+}
+
+main {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
 #title-bar {
     background-color: #002e5d;
     color: white;
@@ -15,7 +32,7 @@ html {
     align-items: center;
 }
 
-#login-button {
+#login-header-link {
     text-decoration: none;;
     font-weight: 500;
     font-size: large;
@@ -24,16 +41,6 @@ html {
 
 #app-title {
     padding-left: 5px;
-}
-
-header, body {
-    margin: 0;
-    padding: 0;
-}
-
-header {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.16);
-    border-bottom: 1px solid #ddd;
 }
 
 nav {
