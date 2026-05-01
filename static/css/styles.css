@@ -3,13 +3,45 @@ html {
     color: #141414
 }
 
+#title-bar {
+    background-color: #002e5d;
+    color: white;
+    margin: 0;
+    padding: 0 10px ;
+    text-align: left;
+    font-weight: 400;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#login-button {
+    text-decoration: none;;
+    font-weight: 500;
+    font-size: large;
+    color: white;
+}
+
+/* #app-title {
+    display: inline-block;
+} */
+
+header, body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.16);
+    border-bottom: 1px solid #ddd;
+}
+
 nav {
     background-color: white;
     color: #002e5d;
     padding: 10px;
     display: flex;
     flex-direction: column;
-    text-align: left;
 
     ul {
         list-style-type: none;
