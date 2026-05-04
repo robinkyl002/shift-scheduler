@@ -11,7 +11,8 @@ func main() {
 	mux.HandleFunc("GET /{$}", home)
 	mux.HandleFunc("GET /login", loginPage)
 	mux.HandleFunc("POST /login", login)
-	mux.HandleFunc("GET /schedule", getIndividualSchedule)
+
+	mux.HandleFunc("GET /schedule", requireAuth(getIndividualSchedule))
 	mux.HandleFunc("POST /schedule", submitSchedule)
 
 	fs := http.FileServer(http.Dir("./static"))

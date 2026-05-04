@@ -112,6 +112,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 				return
 			}
+
+			if r.Header.Get("HX-Request") == "true" {
+				w.Header().Set("HX-Redirect", "/schedule")
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			http.Redirect(w, r, "/schedule", http.StatusSeeOther)
 			return
 		}
 	}
@@ -121,7 +128,34 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
-	log.Print("GET /schedule request received. Process is not yet implemented.")
+	// log.Print("GET /schedule request received. Process is not yet implemented.")
+
+	files := []string{
+		"./templates/base.html",
+		"./components/navbar.html",
+		"./templates/schedule.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		err = ts.ExecuteTemplate(w, "content", nil)
+	} else {
+		err = ts.ExecuteTemplate(w, "base", nil)
+	}
+
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Print("Schedule page served")
 }
 
 func submitSchedule(w http.ResponseWriter, r *http.Request) {
