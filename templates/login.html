@@ -1,7 +1,7 @@
 {{define "content"}}
     <div id="login-container">
         <h2>Login</h2>
-        <form hx-post="/login" hx-target="main" hx-swap="innerHTML">
+        <form id="login-form" hx-post="/login" hx-target="main" hx-swap="innerHTML">
             <div>
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -10,7 +10,7 @@
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Sign In</button>
+            <button type="submit" class="default-button">Sign In</button>
         </form>
     </div>
 {{end}}
