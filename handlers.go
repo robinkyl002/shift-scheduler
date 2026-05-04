@@ -127,6 +127,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
+func logout(w http.ResponseWriter, r *http.Request) {
+	clearSession(w, r)
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", "/login")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
 func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 	// log.Print("GET /schedule request received. Process is not yet implemented.")
 
