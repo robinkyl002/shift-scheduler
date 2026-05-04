@@ -129,4 +129,17 @@ func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+func buildTemplateData(r *http.Request) TemplateData {
+	session, _, err := getSession(r)
+	if err != nil {
+		return TemplateData{IsAuthenticated: false}
+	}
+
+	return TemplateData{
+		IsAuthenticated: true,
+		Username:        session.Username,
+		Role:            session.Role,
+	}
+}
+
 func requireRole(role string, next http.HandlerFunc) http.HandlerFunc { return nil }

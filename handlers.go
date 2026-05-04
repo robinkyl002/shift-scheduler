@@ -23,7 +23,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", nil)
+	templateData := buildTemplateData(r)
+	err = ts.ExecuteTemplate(w, "base", templateData)
 	if err != nil {
 		log.Print(err.Error())
 		return
@@ -46,10 +47,12 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	templateData := buildTemplateData(r)
+
 	if r.Header.Get("HX-Request") == "true" {
-		err = ts.ExecuteTemplate(w, "content", nil)
+		err = ts.ExecuteTemplate(w, "content", templateData)
 	} else {
-		err = ts.ExecuteTemplate(w, "base", nil)
+		err = ts.ExecuteTemplate(w, "base", templateData)
 	}
 
 	if err != nil {
@@ -153,10 +156,12 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	templateData := buildTemplateData(r)
+
 	if r.Header.Get("HX-Request") == "true" {
-		err = ts.ExecuteTemplate(w, "content", nil)
+		err = ts.ExecuteTemplate(w, "content", templateData)
 	} else {
-		err = ts.ExecuteTemplate(w, "base", nil)
+		err = ts.ExecuteTemplate(w, "base", templateData)
 	}
 
 	if err != nil {
