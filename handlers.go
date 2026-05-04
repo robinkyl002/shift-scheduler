@@ -10,16 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
-}
-
-type UserFile struct {
-	Users []User `json:"users"`
-}
-
 func home(w http.ResponseWriter, r *http.Request) {
 	files := []string{
 		"./templates/base.html",
