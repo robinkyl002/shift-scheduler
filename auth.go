@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"log"
 	"net/http"
 	"sync"
@@ -14,6 +15,8 @@ type Session struct {
 	Role      string
 	ExpiresAt time.Time
 }
+
+const SESSION_COOKIE_NAME = "session_id"
 
 var sessions = make(map[string]Session)
 var sessionsMu sync.RWMutex
@@ -45,7 +48,7 @@ func createSession(w http.ResponseWriter, user User) error {
 	sessionsMu.Unlock()
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "session_id",
+		Name:     SESSION_COOKIE_NAME,
 		Value:    sessionID,
 		Path:     "/",
 		Expires:  expiresAt,
@@ -58,10 +61,54 @@ func createSession(w http.ResponseWriter, user User) error {
 	return nil
 }
 
-func getSession(r *http.Request) (*Session, error) { return nil, nil }
+func getSession(r *http.Request) (*Session, string, error) {
+	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
+	if err != nil {
+		return nil, "", err
+	}
+
+	sessionsMu.RLock()
+	session, ok := sessions[cookie.Value]
+	sessionsMu.RUnlock()
+
+	if !ok {
+		return nil, cookie.Value, errors.New("session not found")
+	}
+
+	if time.Now().After(session.ExpiresAt) {
+		return nil, cookie.Value, errors.New("session expired")
+	}
+
+	return &session, cookie.Value, nil
+}
 
 func clearSession(w http.ResponseWriter, r *http.Request) error { return nil }
 
-func requireAuth(next http.HandlerFunc) http.HandlerFunc { return nil }
+func requireAuth(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, sessionID, err := getSession(r)
+		if err != nil {
+			if sessionID != "" {
+				sessionsMu.Lock()
+				delete(sessions, sessionID)
+				sessionsMu.Unlock()
+			}
+
+			http.SetCookie(w, &http.Cookie{
+				Name:     SESSION_COOKIE_NAME,
+				Value:    "",
+				Path:     "/",
+				MaxAge:   -1,
+				HttpOnly: true,
+			})
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			log.Printf("Unauthorized access attempt: %v", err)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		next(w, r)
+
+	}
+}
 
 func requireRole(role string, next http.HandlerFunc) http.HandlerFunc { return nil }
