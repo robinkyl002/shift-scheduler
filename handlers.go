@@ -122,3 +122,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	log.Printf("User %s does not exist", username)
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
+
+func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
+	log.Print("GET /schedule request received. Process is not yet implemented.")
+}
+
+func submitSchedule(w http.ResponseWriter, r *http.Request) {
+	log.Print("POST /schedule request received. Process is not yet implemented.")
+}
