@@ -9,3 +9,9 @@ type User struct {
 type UserFile struct {
 	Users []User `json:"users"`
 }
+
+type TemplateData struct {
+	IsAuthenticated bool
+	Username        string
+	Role            string
+}
