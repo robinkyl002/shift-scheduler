@@ -82,7 +82,25 @@ func getSession(r *http.Request) (*Session, string, error) {
 	return &session, cookie.Value, nil
 }
 
-func clearSession(w http.ResponseWriter, r *http.Request) error { return nil }
+func clearSession(w http.ResponseWriter, r *http.Request) error {
+	cookie, err := r.Cookie(SESSION_COOKIE_NAME)
+	if err != nil {
+		return err
+	}
+
+	sessionsMu.Lock()
+	delete(sessions, cookie.Value)
+	sessionsMu.Unlock()
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     SESSION_COOKIE_NAME,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	})
+	return nil
+}
 
 func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -102,8 +120,8 @@ func requireAuth(next http.HandlerFunc) http.HandlerFunc {
 				HttpOnly: true,
 			})
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			log.Printf("Unauthorized access attempt: %v", err)
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			// log.Printf("Unauthorized access attempt: %v", err)
+			// http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		next(w, r)
