@@ -16,11 +16,18 @@
     <header>
         <div id="title-bar">
             <h1 id="app-title">Shift Scheduler</h1>
+
+            {{if .IsAuthenticated}}
+            <form id="logout-form" hx-post="/logout" hx-target="main" hx-push-url="true">
+                <button type="submit" class="default-button">Logout</button>
+            </form>
+            {{else}}    
             <a id="login-header-link"
                 href="/login"
                 hx-get="/login" 
                 hx-target="main" 
                 hx-push-url="true">Sign In</a>
+            {{end}}
         </div>
         
         {{template "nav" .}}
