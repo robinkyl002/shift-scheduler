@@ -1,7 +1,8 @@
-
-
+// const table = document.getElementById("schedule-table")
 const selected = new Set();
 const minutesPerSlot = 10;
+let isDragging = false
+let dragMode = null
 
 function formatMinutes(totalMinutes) {
     const hours = Math.floor(totalMinutes / 60);
@@ -9,12 +10,16 @@ function formatMinutes(totalMinutes) {
     return `${hours}h ${minutes}m`;
 }
 
-function updatedHiddenInput() {
-    document.getElementById('selected-slots').value = 
-    JSON.stringify(Array.from(selected));
+function updateHiddenInput() {
+    const input = document.getElementById('selected-slots')
+    if (!input) return;
+    input.value = JSON.stringify(Array.from(selected));
 }
 
 function updateTotals() {
+    const weeklyTotal = document.getElementById('weekly-total')
+    if(!weeklyTotal) return;
+
     const dayMinutes = {};
     let weeklyMinutes = 0;
 
@@ -24,7 +29,7 @@ function updateTotals() {
         weeklyMinutes += minutesPerSlot;
     }
 
-    document.getElementById('weekly-total').textContent = `Weekly Total: ${formatMinutes(weeklyMinutes)}`;
+    weeklyTotal.textContent = `Weekly Total: ${formatMinutes(weeklyMinutes)}`;
 
     document.querySelectorAll("tr[data-day]").forEach((row) => {
         const day = row.dataset.day;
@@ -34,17 +39,21 @@ function updateTotals() {
 
 }
 
-document.addEventListener("click", (event) => {
-    const button = event.target.closest(".slice")
-    if (!button) return;
-
-    const key = [
+function getSlotKey(button) {
+    return [
         button.dataset.day,
         button.dataset.hour,
         button.dataset.slice
     ].join("|")
+}
 
-    if (selected.has(key)) {
+function setSliceState(button, shouldSelect) {
+    const key = getSlotKey(button)
+    
+    if (shouldSelect && selected.has(key)) return;
+    if (!shouldSelect && !selected.has(key)) return;
+
+    if (!shouldSelect) {
         selected.delete(key)
         button.classList.remove("selected")
         button.setAttribute("aria-pressed", "false")
@@ -54,9 +63,37 @@ document.addEventListener("click", (event) => {
         button.setAttribute("aria-pressed", "true")
     }
 
-    updatedHiddenInput()
+    updateHiddenInput()
     updateTotals()
+}
+
+document.addEventListener("pointerdown", (event) => {
+    const button = event.target.closest(".slice")
+    if (!button) return;
+
+    event.preventDefault()
+
+    const key = getSlotKey(button)
+    isDragging = true
+    dragMode = selected.has(key) ? "deselect" : "select"
+
+    setSliceState(button, dragMode === 'select')
+
 })
 
-updatedHiddenInput()
+document.addEventListener("pointerover", (event) => {
+    if (!isDragging) return;
+
+    const button = event.target.closest(".slice")
+    if (!button) return;
+
+    setSliceState(button, dragMode === 'select')
+})
+
+document.addEventListener('pointerup', () => {
+    isDragging = false
+    dragMode = null
+})
+
+updateHiddenInput()
 updateTotals()

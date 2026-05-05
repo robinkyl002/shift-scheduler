@@ -133,3 +133,7 @@ nav ul li a {
 .slice.selected {
   background: #0047ba;
 }
+
+#schedule-container, #schedule-table, .slice {
+    user-select: none;
+}
