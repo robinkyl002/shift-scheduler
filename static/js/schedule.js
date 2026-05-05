@@ -51,7 +51,7 @@ document.addEventListener("click", (event) => {
     } else {
         selected.add(key)
         button.classList.add("selected")
-        button.setAttribute("aria")
+        button.setAttribute("aria-pressed", "true")
     }
 
     updatedHiddenInput()

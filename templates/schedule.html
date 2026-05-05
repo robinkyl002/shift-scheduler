@@ -4,7 +4,7 @@
         <form id="schedule-form" hx-post="/schedule" hx-target="main" hx-swap="innerHTML">
             <input type="hidden" name="selected-slots" id="selected-slots">
 
-            <p>Weekly total: <span id="weekly-total">0h 0m</span></p>
+            <p><span id="weekly-total">Weekly Total: 0h 0m</span></p>
 
             <table id="schedule-table">
                 <thead>
@@ -17,7 +17,7 @@
                 </thead>
                 <tbody>
                     {{range $day := $.Schedule.Days}}
-                    <tr>
+                    <tr data-day="{{$day}}">
                         <th scope="row">{{$day}}</th>
                         {{range $hour := $.Schedule.Hours}}
                             <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
@@ -35,7 +35,7 @@
                             </td>
                         {{end}}
                         <td class="day-total-cell">
-                            Daily Total: <span class="daily-total"></span>
+                            Daily Total: <span class="day-total">0h 0m</span>
                         </td>
                     </tr>
                     {{end}}
@@ -46,5 +46,7 @@
                 Submit Schedule
             </button>
         </form>
+
+        <div id="save-status"></div>
     </div>
 {{end}}
