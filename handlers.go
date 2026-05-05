@@ -149,7 +149,12 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		"./templates/schedule.html",
 	}
 
-	ts, err := template.ParseFiles(files...)
+	funcMap := template.FuncMap{
+		"formatHour":   formatHour,
+		"sliceIndices": sliceIndices,
+	}
+
+	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -157,6 +162,7 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateData := buildTemplateData(r)
+	templateData.Schedule = buildSchedulePageData()
 
 	if r.Header.Get("HX-Request") == "true" {
 		err = ts.ExecuteTemplate(w, "content", templateData)

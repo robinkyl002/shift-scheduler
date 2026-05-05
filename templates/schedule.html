@@ -5,201 +5,37 @@
             <thead>
                 <tr>
                     <th scope="col"></th>
-                    <th scope="col">8am</th>
-                    <th scope="col">9am</th>
-                    <th scope="col">10am</th>
-                    <th scope="col">11am</th>
-                    <th scope="col">12pm</th>
-                    <th scope="col">1pm</th>
-                    <th scope="col">2pm</th>
-                    <th scope="col">3pm</th>
-                    <th scope="col">4pm</th>
-                    <th scope="col">5pm</th>
+                    {{range $hour := .Schedule.Hours}}
+                        <th scope="col">{{ formatHour $hour}}</th>
+                    {{end}}
                 </tr>
             </thead>
             <tbody>
+                {{range $day := $.Schedule.Days}}
                 <tr>
-                    <th scope="row">Mon</th>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "8", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "9", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "10", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "11", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "12", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "13", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "14", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "15", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "16", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Monday", "hour": "17", "slot": "6"}'></button>
-                        </div>
-                    </td>
+                    <th scope="row">{{$day}}</th>
+                    {{range $hour := $.Schedule.Hours}}
+                        <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
+                            <div>
+                            {{range sliceIndices $.Schedule.SlicesPerHour}}
+                            <button
+                                type="button"
+                                class="slice"
+                                data-day="{{$day}}"
+                                data-hour="{{$hour}}"
+                                data-slice="{{.}}">
+                            </button>
+                            {{end}}
+                            </div>
+                        </td>
+                    {{end}}
                 </tr>
-                <tr>
-                    <th scope="row">Tue</th>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "8", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "9", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell">
-                        <div class="cell-slices">
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "1"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "2"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "3"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "4"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "5"}'></button>
-                            <button class="slice" hx-post="/schedule/select" hx-vals='{"day": "Tuesday", "hour": "10", "slot": "6"}'></button>
-                        </div>
-                    </td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Wed</th>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Thu</th>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                </tr>
-                <tr>
-                    <th scope="row">Fri</th>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                    <td class="schedule-cell"></td>
-                </tr>
+                {{end}}
             </tbody>
         </table>
+
+        <button id="submit-schedule" hx-post="/schedule/submit" hx-trigger="click" hx-target="#schedule-container" hx-swap="outerHTML">
+            Submit Schedule
+        </button>
     </div>
 {{end}}
