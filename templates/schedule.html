@@ -1,41 +1,50 @@
 {{define "content"}}
     <div id="schedule-container">
         <h2>Your Schedule</h2>
-        <table id="schedule-table">
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                    {{range $hour := .Schedule.Hours}}
-                        <th scope="col">{{ formatHour $hour}}</th>
-                    {{end}}
-                </tr>
-            </thead>
-            <tbody>
-                {{range $day := $.Schedule.Days}}
-                <tr>
-                    <th scope="row">{{$day}}</th>
-                    {{range $hour := $.Schedule.Hours}}
-                        <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
-                            <div class="cell-slices">
-                            {{range sliceIndices $.Schedule.SlicesPerHour}}
-                            <button
-                                type="button"
-                                class="slice"
-                                data-day="{{$day}}"
-                                data-hour="{{$hour}}"
-                                data-slice="{{.}}">
-                            </button>
-                            {{end}}
-                            </div>
-                        </td>
-                    {{end}}
-                </tr>
-                {{end}}
-            </tbody>
-        </table>
+        <form id="schedule-form" hx-post="/schedule" hx-target="main" hx-swap="innerHTML">
+            <input type="hidden" name="selected-slots" id="selected-slots">
 
-        <button id="submit-schedule" hx-post="/schedule/submit" hx-trigger="click" hx-target="#schedule-container" hx-swap="outerHTML">
-            Submit Schedule
-        </button>
+            <p>Weekly total: <span id="weekly-total">0h 0m</span></p>
+
+            <table id="schedule-table">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        {{range $hour := .Schedule.Hours}}
+                            <th scope="col">{{ formatHour $hour}}</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $day := $.Schedule.Days}}
+                    <tr>
+                        <th scope="row">{{$day}}</th>
+                        {{range $hour := $.Schedule.Hours}}
+                            <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
+                                <div class="cell-slices">
+                                {{range sliceIndices $.Schedule.SlicesPerHour}}
+                                <button
+                                    type="button"
+                                    class="slice"
+                                    data-day="{{$day}}"
+                                    data-hour="{{$hour}}"
+                                    data-slice="{{.}}">
+                                </button>
+                                {{end}}
+                                </div>
+                            </td>
+                        {{end}}
+                        <td class="day-total-cell">
+                            Daily Total: <span class="daily-total"></span>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+
+            <button type="submit" class="default-button">
+                Submit Schedule
+            </button>
+        </form>
     </div>
 {{end}}

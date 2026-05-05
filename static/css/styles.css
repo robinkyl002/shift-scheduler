@@ -129,3 +129,7 @@ nav ul li a {
     padding: 0;
     /* width: 2px; */
 }
+
+.slice.selected {
+  background: #0047ba;
+}
