@@ -49,24 +49,25 @@ nav {
     padding: 10px;
     display: flex;
     flex-direction: column;
+}
 
-    ul {
-        list-style-type: none;
+nav ul {
+    list-style-type: none;
         margin: 0;
         padding: 10px 20px;
         display: block;
         gap: 20px;
-        li {
-            display: inline-block;
-            margin-right: 20px;
-            a {
-                text-decoration: none;
-                color: #002e5d;
-                font-weight: bold;
-            }
-        }
+}
 
-    }
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #002e5d;
+    font-weight: bold;
 }
 
 .default-button {
@@ -79,4 +80,27 @@ nav {
     font-size: 1rem;
     cursor: pointer;
     border-radius: 4px;
+}
+
+#schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 2px solid slategray;
+    margin-top: 20px;
+    table-layout: fixed;
+}
+
+#schedule-table th, #schedule-table td {
+    border: 2px solid slategray;
+    padding: 10px;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    min-width: 120px;
+    height: 60px;
+}
+
+#schedule-container {
+    width: 85vw;
+    margin: 0 auto;
+    justify-content: center;
 }
