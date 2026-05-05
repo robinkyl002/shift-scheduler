@@ -92,15 +92,40 @@ nav ul li a {
 
 #schedule-table th, #schedule-table td {
     border: 2px solid slategray;
-    padding: 10px;
+    /* padding: 10px; */
     text-align: center;
-    padding: 1rem 1.5rem;
-    min-width: 120px;
-    height: 60px;
+    /* padding: 1rem 1.5rem; */
+    min-width: 70px;
+    /* height: 60px; */
 }
 
 #schedule-container {
     width: 85vw;
     margin: 0 auto;
     justify-content: center;
+}
+
+.schedule-cell {
+    padding: 0;
+}
+
+.cell-slices {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.slice {
+    display: block;
+    border: 1px solid #ccc;
+    background: white;
+    height: 100%;
+    cursor: pointer;
+    min-height: 60px;
+    min-width: 5px;
+    margin: 0;
+    padding: 0;
+    /* width: 2px; */
 }

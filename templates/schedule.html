@@ -16,7 +16,7 @@
                     <th scope="row">{{$day}}</th>
                     {{range $hour := $.Schedule.Hours}}
                         <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
-                            <div>
+                            <div class="cell-slices">
                             {{range sliceIndices $.Schedule.SlicesPerHour}}
                             <button
                                 type="button"

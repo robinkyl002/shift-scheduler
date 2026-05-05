@@ -5,6 +5,8 @@ import "fmt"
 func formatHour(hour int) string {
 	if hour < 12 {
 		return fmt.Sprintf("%dam", hour)
+	} else if hour == 12 {
+		return "12pm"
 	}
 	return fmt.Sprintf("%dpm", hour-12)
 }
