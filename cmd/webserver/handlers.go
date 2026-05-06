@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -180,5 +181,92 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func submitSchedule(w http.ResponseWriter, r *http.Request) {
-	log.Print("POST /schedule request received. Process is not yet implemented.")
+	// log.Print(r.FormValue("selected-slots"))
+
+	session, _, err := getSession(r)
+
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal ServerError", http.StatusInternalServerError)
+		return
+	}
+
+	user := session.Username
+
+	var slots []TimeSlot
+	raw := r.FormValue("selected-slots")
+
+	slots, err = parseSelectedSlots(raw)
+
+	// err = json.Unmarshal([]byte(r.FormValue("selected-slots")), &slots)
+	// if err != nil {
+	// 	log.Print(err.Error())
+	// 	http.Error(w, "Internal ServerError", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	currDate := time.Now()
+
+	scheduleSubmission := ScheduleSubmission{
+		Username:         user,
+		Slots:            slots,
+		Status:           StatusPending,
+		RejectionComment: "",
+		SubmittedAt:      currDate.String(),
+		UpdatedAt:        currDate.String(),
+	}
+
+	scheduleFile, err := os.ReadFile("schedules.json")
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Print("Read schedules.json successfully")
+
+	// log.Printf("Current contents of users.json: %s", string(userFile))
+
+	log.Print("unmarshaling scheduleFile")
+	var schedules ScheduleFile
+	err = json.Unmarshal(scheduleFile, &schedules)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	log.Print("Unmarshal successful")
+	log.Print("checking length of schedules")
+	if len(schedules.Schedules) == 0 {
+		schedules.Schedules = append(schedules.Schedules, scheduleSubmission)
+		log.Print("Attempting to add new schedule to list")
+		log.Print(schedules.Schedules)
+	} else {
+		for i, schedule := range schedules.Schedules {
+			if schedule.Username == scheduleSubmission.Username {
+				schedules.Schedules[i] = scheduleSubmission
+				log.Print("Existing schedule found and replaced")
+				break
+			}
+		}
+		schedules.Schedules = append(schedules.Schedules, scheduleSubmission)
+		log.Print("No existing schedule found for user. Adding new schedule to list")
+	}
+
+	updated, err := json.MarshalIndent(schedules, "", "  ")
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "error marshalling JSON", http.StatusInternalServerError)
+	}
+	log.Print("Attempting to marshall data")
+
+	err = os.WriteFile("schedules.json", updated, 0644)
+
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Coult not write data to file", http.StatusInternalServerError)
+		return
+	}
+
+	log.Print("Updated schedules.json")
+
 }
