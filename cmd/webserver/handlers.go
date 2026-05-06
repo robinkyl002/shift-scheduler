@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -231,6 +232,16 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(scheduleFile, &schedules)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	valid := validateSchedule(scheduleSubmission)
+
+	if len(valid.Errors) != 0 {
+		log.Print(valid.Errors)
+		allErrors := strings.Join(valid.Errors, "\n")
+		http.Error(w, allErrors, http.StatusBadRequest)
+
 		return
 	}
 

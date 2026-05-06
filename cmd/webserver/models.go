@@ -44,3 +44,24 @@ type ScheduleSubmission struct {
 type ScheduleFile struct {
 	Schedules []ScheduleSubmission `json:"schedules"`
 }
+
+type ShiftBlock struct {
+	Day         string
+	StartMinute int
+	EndMinute   int
+	SlotCount   int
+}
+
+var dayOrder = map[string]int{
+	"Mon": 0,
+	"Tue": 1,
+	"Wed": 2,
+	"Thu": 3,
+	"Fri": 4,
+}
+
+type ValidationResult struct {
+	Errors        []string
+	DailyMinutes  map[string]int
+	WeeklyMinutes int
+}
