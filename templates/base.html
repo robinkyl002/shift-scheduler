@@ -42,5 +42,18 @@
     </footer>
 
     <script src="/static/htmx.min.js"></script>
+    <script>
+        document.body.addEventListener("htmx:responseError", (event) => {
+            const xhr = event.detail.xhr;
+            const message = (xhr.responseText || "").trim();
+
+            if (xhr.status === 400 || xhr.status === 401) {
+                alert(message || "Please correct the form and try again.");
+                return;
+            }
+
+            alert("Something went wrong. Please try again.");
+        });
+    </script>
 </html>
 {{end}}

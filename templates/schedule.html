@@ -1,7 +1,7 @@
 {{define "content"}}
     <div id="schedule-container">
         <h2>Your Schedule</h2>
-        <form id="schedule-form" hx-post="/schedule" hx-target="main" hx-swap="innerHTML">
+        <form id="schedule-form" hx-post="/schedule" hx-swap="none">
             <input type="hidden" name="selected-slots" id="selected-slots">
 
             <p><span id="weekly-total">Weekly Total: 0h 0m</span></p>
