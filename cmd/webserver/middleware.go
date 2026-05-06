@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 	"strings"
@@ -91,15 +90,15 @@ func validateSchedule(schedule ScheduleSubmission) ValidationResult {
 	slotsByDay := groupSlotsByDay(slots)
 
 	for day, daySlots := range slotsByDay {
-		// shiftBlocks := buildShiftBlocks(day, daySlots)
+		shiftBlocks := buildShiftBlocks(day, daySlots)
 
-		// for _, block := range shiftBlocks {
-		// 	if block.SlotCount*10 < 180 {
-		// 		startTime := formTimeFromBlock(block, true)
-		// 		endTime := formTimeFromBlock(block, false)
-		// 		result.Errors = append(result.Errors, "Shift from "+startTime+" to "+endTime+" is too short")
-		// 	}
-		// }
+		for _, block := range shiftBlocks {
+			if block.SlotCount*10 < 180 {
+				startTime := formTimeFromBlock(block, true)
+				endTime := formTimeFromBlock(block, false)
+				result.Errors = append(result.Errors, "Shift from "+startTime+" to "+endTime+" is too short")
+			}
+		}
 
 		if calculateDayMinutes(daySlots) > 540 {
 			result.Errors = append(result.Errors, "You may not work more than 9 hours per day. You currently have a shift longer than this on "+day)
@@ -132,18 +131,35 @@ func groupSlotsByDay(slots []TimeSlot) map[string][]TimeSlot {
 }
 
 func buildShiftBlocks(day string, slots []TimeSlot) []ShiftBlock {
+	if len(slots) == 0 {
+		return []ShiftBlock{}
+	}
+
 	shiftBlocks := []ShiftBlock{}
 
 	currShiftBlock := ShiftBlock{
 		Day:         day,
-		StartMinute: -1,
-		EndMinute:   -1,
-		SlotCount:   0,
+		StartMinute: slots[0].StartMinute(),
+		EndMinute:   slots[0].StartMinute() + 10,
+		SlotCount:   1,
 	}
-	for _, slot := range slots {
-		log.Print(currShiftBlock)
-		log.Print(slot)
+	for _, slot := range slots[1:] {
+
+		if slot.StartMinute() == currShiftBlock.EndMinute {
+			currShiftBlock.EndMinute += 10
+			currShiftBlock.SlotCount++
+		} else {
+			shiftBlocks = append(shiftBlocks, currShiftBlock)
+			currShiftBlock = ShiftBlock{
+				Day:         day,
+				StartMinute: slot.StartMinute(),
+				EndMinute:   slot.StartMinute() + 10,
+				SlotCount:   1,
+			}
+		}
 	}
+
+	shiftBlocks = append(shiftBlocks, currShiftBlock)
 
 	return shiftBlocks
 }
@@ -160,14 +176,27 @@ func formTimeFromBlock(block ShiftBlock, start bool) string {
 	var hour int
 	var minute int
 	if start {
-		hour = (block.StartMinute / 10) + 8
-		minute = (block.StartMinute % 10)
+		hour = (block.StartMinute / 60) + 8
+
+		if hour > 12 {
+			hour -= 12
+		}
+		minute = (block.StartMinute % 60)
 	} else {
-		hour = (block.EndMinute / 10) + 8
-		minute = (block.EndMinute % 10)
+		hour = (block.EndMinute / 60) + 8
+		minute = (block.EndMinute % 60)
 	}
 
-	return fmt.Sprintf("%d:%d", hour, minute)
+	if hour > 12 {
+		hour -= 12
+	}
+
+	if minute == 0 {
+		return fmt.Sprintf("%d:00", hour)
+	} else {
+		return fmt.Sprintf("%d:%d", hour, minute)
+	}
+
 }
 
 func weeklyMinutesToHours(totalMinutes int) string {
