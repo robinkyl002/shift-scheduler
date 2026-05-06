@@ -129,8 +129,6 @@ func logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
-	// log.Print("GET /schedule request received. Process is not yet implemented.")
-
 	files := []string{
 		"./templates/base.html",
 		"./components/navbar.html",
@@ -238,6 +236,34 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Coult not write data to file", http.StatusInternalServerError)
+		return
+	}
+}
+
+func adminPage(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./templates/approval.html",
+		"./templates/base.html",
+		"./components/navbar.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Print(err.Error())
+		return
+	}
+
+	templateData := buildTemplateData(r)
+
+	if r.Header.Get("HX-Request") == "true" {
+		err = ts.ExecuteTemplate(w, "content", templateData)
+	} else {
+		err = ts.ExecuteTemplate(w, "base", templateData)
+	}
+
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 }

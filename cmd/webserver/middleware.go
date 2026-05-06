@@ -68,7 +68,6 @@ func parseSelectedSlots(raw string) ([]TimeSlot, error) {
 }
 
 func validateSchedule(schedule ScheduleSubmission) ValidationResult {
-	// calculateDailyMinutes()
 	result := ValidationResult{
 		Errors:        []string{},
 		DailyMinutes:  map[string]int{},
