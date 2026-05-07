@@ -135,6 +135,7 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		"./templates/base.html",
 		"./components/navbar.html",
 		"./templates/schedule.html",
+		"./templates/week_view.html",
 	}
 
 	funcMap := template.FuncMap{

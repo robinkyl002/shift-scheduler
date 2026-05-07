@@ -42,17 +42,27 @@ function updateTotals() {
 function syncSelectedFromDOM() {
     selected.clear()
 
-    document.querySelectorAll(".slice.selected").forEach((button) => {
+    document.querySelectorAll("button.slice.selected").forEach((button) => {
         selected.add(getSlotKey(button))
         button.setAttribute("aria-pressed", "true")
     })
 
-    document.querySelectorAll(".slice:not(.selected)").forEach((button) => {
+    document.querySelectorAll("button.slice:not(.selected)").forEach((button) => {
         button.setAttribute("aria-pressed", "false")
     })
 }
 
 function initializeScheduleUI() {
+    const table = document.getElementById("schedule-table")
+    if (!table) return
+
+    if (table.dataset.weekViewMode === "readonly") {
+        selected.clear()
+        isDragging = false
+        dragMode = null
+        return
+    }
+    
     syncSelectedFromDOM()
     updateHiddenInput()
     updateTotals()
@@ -87,7 +97,7 @@ function setSliceState(button, shouldSelect) {
 }
 
 document.addEventListener("pointerdown", (event) => {
-    const button = event.target.closest(".slice")
+    const button = event.target.closest("button.slice")
     if (!button) return;
 
     event.preventDefault()
@@ -103,7 +113,7 @@ document.addEventListener("pointerdown", (event) => {
 document.addEventListener("pointerover", (event) => {
     if (!isDragging) return;
 
-    const button = event.target.closest(".slice")
+    const button = event.target.closest("button.slice")
     if (!button) return;
 
     setSliceState(button, dragMode === 'select')

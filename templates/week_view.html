@@ -1,3 +1,43 @@
 {{define "week_view"}}
+<p><span id="weekly-total">Weekly Total: {{formatMinutes .WeekView.WeeklyTotalMinutes}}</span></p>
 
+<table id="schedule-table" data-week-view-mode="{{if $.WeekView.ReadOnly}}readonly{{else}}editable{{end}}">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            {{range $hour := .WeekView.Hours}}
+                <th scope="col">{{ formatHour $hour}}</th>
+            {{end}}
+        </tr>
+    </thead>
+    <tbody>
+        {{range $row := $.WeekView.Rows}}
+        <tr data-day="{{$row.Day}}">
+            <th scope="row">{{$row.Day}}</th>
+            {{range $cell := $row.Cells}}
+                <td class="schedule-cell" data-day="{{$row.Day}}" data-hour="{{$cell.Hour}}">
+                    <div class="cell-slices">
+                    {{range $slice := $cell.Slices}}
+                        {{if $.WeekView.ReadOnly}}
+                        <span class="slice{{if $slice.Selected}} selected{{end}}"></span>
+                        {{else}}
+                        <button
+                            type="button"
+                            class="slice{{if $slice.Selected}} selected{{end}}"
+                            data-day="{{$row.Day}}"
+                            data-hour="{{$cell.Hour}}"
+                            data-slice="{{$slice.Index}}">
+                        </button>
+                        {{end}}
+                    {{end}}
+                    </div>
+                </td>
+            {{end}}
+            <td class="day-total-cell">
+                Daily Total: <span class="day-total">{{formatMinutes $row.TotalMinutes}}</span>
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
 {{end}}
