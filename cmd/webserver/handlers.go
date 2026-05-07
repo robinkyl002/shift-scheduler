@@ -249,11 +249,13 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 		"./components/navbar.html",
 	}
 
+	log.Print("Attempting to parse files")
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Print(err.Error())
 		return
 	}
+	log.Print("Files parsed, building template data and trying to build template")
 
 	templateData := buildTemplateData(r)
 
@@ -268,4 +270,6 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	log.Print("Successfully built the page")
 }
