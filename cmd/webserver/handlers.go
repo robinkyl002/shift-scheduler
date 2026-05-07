@@ -104,12 +104,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			redirectPath := defaultLandingPath(user.Role)
+
 			if r.Header.Get("HX-Request") == "true" {
-				w.Header().Set("HX-Redirect", "/schedule")
+				w.Header().Set("HX-Redirect", redirectPath)
 				w.WriteHeader(http.StatusOK)
 				return
 			}
-			http.Redirect(w, r, "/schedule", http.StatusSeeOther)
+			http.Redirect(w, r, redirectPath, http.StatusSeeOther)
 			return
 		}
 	}

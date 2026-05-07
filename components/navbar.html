@@ -2,8 +2,12 @@
 <nav>
     <ul>
         <li><a href="/">Home</a></li>
+        {{if eq .Role "User"}}
         <li><a href="/schedule">Schedule</a></li>
+        {{end}}
+        {{if eq .Role "Admin"}}
         <li><a href="/admin">Admin</a></li>
+        {{end}}
     </ul>
 </nav>
 {{end}}

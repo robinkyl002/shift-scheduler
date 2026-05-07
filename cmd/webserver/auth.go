@@ -142,4 +142,40 @@ func buildTemplateData(r *http.Request) TemplateData {
 	}
 }
 
-func requireRole(role string, next http.HandlerFunc) http.HandlerFunc { return nil }
+func defaultLandingPath(role string) string {
+	if role == "Admin" {
+		return "/admin"
+	}
+
+	return "/schedule"
+}
+
+func requireRole(role string, next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		session, _, err := getSession(r)
+
+		if err != nil {
+			if r.Header.Get("HX-Request") == "true" {
+				w.Header().Set("HX-Redirect", "/login")
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		if session.Role != role {
+			redirectPath := defaultLandingPath(session.Role)
+			if r.Header.Get("HX-Request") == "true" {
+				w.Header().Set("HX-Redirect", redirectPath)
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			http.Redirect(w, r, redirectPath, http.StatusSeeOther)
+			return
+		}
+		next(w, r)
+	}
+
+}
