@@ -16,12 +16,9 @@ type SchedulePageData struct {
 }
 
 func buildSchedulePageData() SchedulePageData {
-	days := []string{"Mon", "Tue", "Wed", "Thu", "Fri"}
-	hours := []int{8, 9, 10, 11, 12, 13, 14, 15, 16, 17}
-	slicesPerHour := 6
 	return SchedulePageData{
-		Days:          days,
-		Hours:         hours,
+		Days:          weekDays,
+		Hours:         weekHours,
 		SlicesPerHour: slicesPerHour,
 	}
 }
@@ -113,7 +110,7 @@ func validateSchedule(schedule ScheduleSubmission) ValidationResult {
 }
 
 func (t TimeSlot) StartMinute() int {
-	return (t.Hour-8)*60 + (t.Slice * 10)
+	return (t.Hour-scheduleStartHour)*60 + (t.Slice * minutesPerSlice)
 }
 
 func groupSlotsByDay(slots []TimeSlot) map[string][]TimeSlot {
@@ -139,20 +136,20 @@ func buildShiftBlocks(day string, slots []TimeSlot) []ShiftBlock {
 	currShiftBlock := ShiftBlock{
 		Day:         day,
 		StartMinute: slots[0].StartMinute(),
-		EndMinute:   slots[0].StartMinute() + 10,
+		EndMinute:   slots[0].StartMinute() + minutesPerSlice,
 		SlotCount:   1,
 	}
 	for _, slot := range slots[1:] {
 
 		if slot.StartMinute() == currShiftBlock.EndMinute {
-			currShiftBlock.EndMinute += 10
+			currShiftBlock.EndMinute += minutesPerSlice
 			currShiftBlock.SlotCount++
 		} else {
 			shiftBlocks = append(shiftBlocks, currShiftBlock)
 			currShiftBlock = ShiftBlock{
 				Day:         day,
 				StartMinute: slot.StartMinute(),
-				EndMinute:   slot.StartMinute() + 10,
+				EndMinute:   slot.StartMinute() + minutesPerSlice,
 				SlotCount:   1,
 			}
 		}
@@ -164,25 +161,25 @@ func buildShiftBlocks(day string, slots []TimeSlot) []ShiftBlock {
 }
 
 func calculateDayMinutes(slots []TimeSlot) int {
-	return len(slots) * 10
+	return len(slots) * minutesPerSlice
 }
 
 func calculateWeeklyMinutes(slots []TimeSlot) int {
-	return len(slots) * 10
+	return len(slots) * minutesPerSlice
 }
 
 func formTimeFromBlock(block ShiftBlock, start bool) string {
 	var hour int
 	var minute int
 	if start {
-		hour = (block.StartMinute / 60) + 8
+		hour = (block.StartMinute / 60) + scheduleStartHour
 
 		if hour > 12 {
 			hour -= 12
 		}
 		minute = (block.StartMinute % 60)
 	} else {
-		hour = (block.EndMinute / 60) + 8
+		hour = (block.EndMinute / 60) + scheduleStartHour
 		minute = (block.EndMinute % 60)
 	}
 
