@@ -181,6 +181,12 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 
 	slots, err = parseSelectedSlots(raw)
 
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	currDate := time.Now()
 
 	scheduleSubmission := ScheduleSubmission{
@@ -192,16 +198,14 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:        currDate.String(),
 	}
 
-	scheduleFile, err := os.ReadFile("schedules.json")
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	// Prevent race conditions
+	scheduleMu.Lock()
+	defer scheduleMu.Unlock()
 
-	var schedules ScheduleFile
-	err = json.Unmarshal(scheduleFile, &schedules)
+	schedules, err := loadSchedules()
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Print(err.Error())
+		http.Error(w, "Could not load stored schedules", http.StatusInternalServerError)
 		return
 	}
 
@@ -211,33 +215,16 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		log.Print(valid.Errors)
 		allErrors := strings.Join(valid.Errors, "\n")
 		http.Error(w, allErrors, http.StatusBadRequest)
-
 		return
 	}
 
-	if len(schedules.Schedules) == 0 {
-		schedules.Schedules = append(schedules.Schedules, scheduleSubmission)
-	} else {
-		for i, schedule := range schedules.Schedules {
-			if schedule.Username == scheduleSubmission.Username {
-				schedules.Schedules[i] = scheduleSubmission
-				break
-			}
-		}
-		schedules.Schedules = append(schedules.Schedules, scheduleSubmission)
-	}
+	upsertSchedule(&schedules, scheduleSubmission)
 
-	updated, err := json.MarshalIndent(schedules, "", "  ")
-	if err != nil {
-		log.Print(err.Error())
-		http.Error(w, "error marshalling JSON", http.StatusInternalServerError)
-	}
-
-	err = os.WriteFile("schedules.json", updated, 0644)
+	err = saveSchedules(schedules)
 
 	if err != nil {
 		log.Print(err.Error())
-		http.Error(w, "Coult not write data to file", http.StatusInternalServerError)
+		http.Error(w, "Could not write data to file", http.StatusInternalServerError)
 		return
 	}
 }
