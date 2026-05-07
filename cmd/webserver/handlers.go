@@ -187,17 +187,6 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currDate := time.Now()
-
-	scheduleSubmission := ScheduleSubmission{
-		Username:         user,
-		Slots:            slots,
-		Status:           StatusPending,
-		RejectionComment: "",
-		SubmittedAt:      currDate.String(),
-		UpdatedAt:        currDate.String(),
-	}
-
 	// Prevent race conditions
 	scheduleMu.Lock()
 	defer scheduleMu.Unlock()
@@ -209,6 +198,15 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	existingIndex := findScheduleIndex(schedules.Schedules, user)
+
+	var existing *ScheduleSubmission
+	if existingIndex >= 0 {
+		existing = &schedules.Schedules[existingIndex]
+	}
+
+	scheduleSubmission := buildScheduleSubmission(user, slots, existing, time.Now())
+
 	valid := validateSchedule(scheduleSubmission)
 
 	if len(valid.Errors) != 0 {
@@ -218,7 +216,7 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	upsertSchedule(&schedules, scheduleSubmission)
+	upsertScheduleAtIndex(&schedules, existingIndex, scheduleSubmission)
 
 	err = saveSchedules(schedules)
 

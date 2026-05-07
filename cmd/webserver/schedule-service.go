@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"sync"
+	"time"
 )
 
 var scheduleMu sync.Mutex
@@ -11,14 +12,12 @@ var scheduleMu sync.Mutex
 func loadSchedules() (ScheduleFile, error) {
 	scheduleFile, err := os.ReadFile("schedules.json")
 	if err != nil {
-		// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return ScheduleFile{}, err
 	}
 
 	var schedules ScheduleFile
 	err = json.Unmarshal(scheduleFile, &schedules)
 	if err != nil {
-		// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return ScheduleFile{}, err
 	}
 
@@ -44,12 +43,35 @@ func findScheduleIndex(schedules []ScheduleSubmission, username string) int {
 	return -1
 }
 
-func upsertSchedule(schedules *ScheduleFile, submission ScheduleSubmission) {
-	found := findScheduleIndex(schedules.Schedules, submission.Username)
+func upsertScheduleAtIndex(schedules *ScheduleFile, index int, submission ScheduleSubmission) {
+	// found := findScheduleIndex(schedules.Schedules, submission.Username)
 
-	if found >= 0 {
-		schedules.Schedules[found] = submission
+	if index >= 0 {
+		schedules.Schedules[index] = submission
 	} else {
 		schedules.Schedules = append(schedules.Schedules, submission)
 	}
+}
+
+func buildScheduleSubmission(
+	username string,
+	slots []TimeSlot,
+	existing *ScheduleSubmission,
+	now time.Time,
+) ScheduleSubmission {
+	submission := ScheduleSubmission{
+		Username:         username,
+		Slots:            slots,
+		Status:           StatusPending,
+		RejectionComment: "",
+		UpdatedAt:        now.String(),
+	}
+
+	if existing != nil {
+		submission.SubmittedAt = existing.SubmittedAt
+	} else {
+		submission.SubmittedAt = now.String()
+	}
+
+	return submission
 }
