@@ -258,10 +258,17 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 		"./templates/approval.html",
 		"./templates/base.html",
 		"./components/navbar.html",
+		"./templates/week_view.html",
 	}
 
 	log.Print("Attempting to parse files")
-	ts, err := template.ParseFiles(files...)
+
+	funcMap := template.FuncMap{
+		"formatHour":    formatHour,
+		"formatMinutes": formatMinutes,
+	}
+
+	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
 		log.Print(err.Error())
 		return
@@ -269,6 +276,7 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	log.Print("Files parsed, building template data and trying to build template")
 
 	templateData := buildTemplateData(r)
+	templateData.WeekView = buildWeekViewData([]TimeSlot{}, true)
 
 	if r.Header.Get("HX-Request") == "true" {
 		err = ts.ExecuteTemplate(w, "content", templateData)
