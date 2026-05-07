@@ -9,20 +9,6 @@ import (
 	"strings"
 )
 
-type SchedulePageData struct {
-	Days          []string
-	Hours         []int
-	SlicesPerHour int
-}
-
-func buildSchedulePageData() SchedulePageData {
-	return SchedulePageData{
-		Days:          weekDays,
-		Hours:         weekHours,
-		SlicesPerHour: slicesPerHour,
-	}
-}
-
 func parseSelectedSlots(raw string) ([]TimeSlot, error) {
 	var slotKeys []string
 	err := json.Unmarshal([]byte(raw), &slotKeys)
