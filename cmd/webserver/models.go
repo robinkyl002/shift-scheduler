@@ -17,6 +17,7 @@ type TemplateData struct {
 
 	CurrentSubmission     *ScheduleSubmission
 	CurrentScheduleStatus ScheduleStatus
+	ValidationErrors      []string
 
 	PendingSchedules        []PendingScheduleSummary
 	SelectedPendingSchedule *ScheduleSubmission

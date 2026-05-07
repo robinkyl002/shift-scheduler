@@ -1,16 +1,37 @@
 {{define "content"}}
     <div id="schedule-container">
         <h2>Your Schedule</h2>
-        <form id="schedule-form" hx-post="/schedule" hx-swap="none">
-            <input type="hidden" name="selected-slots" id="selected-slots">
+
+        <div id="schedule-feedback">
+            {{range .ValidationErrors}}
+                <p>{{.}}</p>
+            {{end}}
+        </div>
+
+        {{if eq .CurrentScheduleStatus "pending"}}
+            <div id="save-status">Status: Pending Approval</div>
+        {{else if eq .CurrentScheduleStatus "approved"}}
+            <div id="save-status">Status: Approved</div>
+        {{else if eq .CurrentScheduleStatus "rejected"}}
+            <div id="save-status">Status: Rejected</div>
+        {{end}}
+        {{if eq .CurrentScheduleStatus "rejected"}}
+            <div id="rejection-comment">Reason: {{.CurrentSubmission.RejectionComment}}</div>
+        {{end}}
+        {{if .WeekView.ReadOnly}}
 
             {{template "week_view" .}}
 
-            <button type="submit" class="default-button">
-                Submit Schedule
-            </button>
-        </form>
+        {{else}}
+            <form id="schedule-form" hx-post="/schedule" hx-target="#schedule-container" hx-swap="outerHTML">
+                <input type="hidden" name="selected-slots" id="selected-slots">
 
-        <div id="save-status"></div>
+                {{template "week_view" .}}
+
+                <button type="submit" class="default-button">
+                    Submit Schedule
+                </button>
+            </form>
+        {{end}}
     </div>
 {{end}}

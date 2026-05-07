@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -208,6 +207,20 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 
 	user := session.Username
 
+	files := []string{
+		"./templates/base.html",
+		"./components/navbar.html",
+		"./templates/schedule.html",
+		"./templates/week_view.html",
+	}
+
+	funcMap := template.FuncMap{
+		"formatHour":    formatHour,
+		"formatMinutes": formatMinutes,
+	}
+
+	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
+
 	var slots []TimeSlot
 	raw := r.FormValue("selected-slots")
 
@@ -243,8 +256,21 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 
 	if len(valid.Errors) != 0 {
 		log.Print(valid.Errors)
-		allErrors := strings.Join(valid.Errors, "\n")
-		http.Error(w, allErrors, http.StatusBadRequest)
+		// allErrors := strings.Join(valid.Errors, "\n")
+		// http.Error(w, allErrors, http.StatusBadRequest)
+
+		templateData := buildTemplateData(r)
+		templateData.CurrentScheduleStatus = scheduleSubmission.Status
+		templateData.ValidationErrors = valid.Errors
+		templateData.WeekView = buildWeekViewData(slots, false)
+
+		if existing != nil {
+			templateData.CurrentSubmission = existing
+			templateData.CurrentScheduleStatus = existing.Status
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		err = ts.ExecuteTemplate(w, "content", templateData)
 		return
 	}
 
@@ -257,6 +283,16 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not write data to file", http.StatusInternalServerError)
 		return
 	}
+
+	templateData := buildTemplateData(r)
+	templateData.CurrentSubmission = &scheduleSubmission
+	templateData.CurrentScheduleStatus = StatusPending
+	templateData.WeekView = buildWeekViewData(scheduleSubmission.Slots, true)
+	templateData.ValidationErrors = nil
+
+	err = ts.ExecuteTemplate(w, "content", templateData)
+	return
+
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request) {
