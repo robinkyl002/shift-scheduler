@@ -174,6 +174,12 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		templateData.CurrentSubmission = submission
 		templateData.CurrentScheduleStatus = submission.Status
 		slots = submission.Slots
+		switch submission.Status {
+		case StatusApproved, StatusPending:
+			readOnly = true
+		default:
+			readOnly = false
+		}
 	}
 
 	templateData.WeekView = buildWeekViewData(slots, readOnly)
