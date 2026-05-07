@@ -43,6 +43,16 @@ func findScheduleIndex(schedules []ScheduleSubmission, username string) int {
 	return -1
 }
 
+func findScheduleByUsername(schedules []ScheduleSubmission, username string) (*ScheduleSubmission, bool) {
+	for i := range schedules {
+		if schedules[i].Username == username {
+			return &schedules[i], true
+		}
+	}
+
+	return nil, false
+}
+
 func upsertScheduleAtIndex(schedules *ScheduleFile, index int, submission ScheduleSubmission) {
 	// found := findScheduleIndex(schedules.Schedules, submission.Username)
 

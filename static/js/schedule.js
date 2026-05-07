@@ -39,6 +39,25 @@ function updateTotals() {
 
 }
 
+function syncSelectedFromDOM() {
+    selected.clear()
+
+    document.querySelectorAll(".slice.selected").forEach((button) => {
+        selected.add(getSlotKey(button))
+        button.setAttribute("aria-pressed", "true")
+    })
+
+    document.querySelectorAll(".slice:not(.selected)").forEach((button) => {
+        button.setAttribute("aria-pressed", "false")
+    })
+}
+
+function initializeScheduleUI() {
+    syncSelectedFromDOM()
+    updateHiddenInput()
+    updateTotals()
+}
+
 function getSlotKey(button) {
     return [
         button.dataset.day,
@@ -95,5 +114,5 @@ document.addEventListener('pointerup', () => {
     dragMode = null
 })
 
-updateHiddenInput()
-updateTotals()
+document.addEventListener("DOMContentLoaded", initializeScheduleUI)
+document.body.addEventListener("htmx:afterSwap", initializeScheduleUI)

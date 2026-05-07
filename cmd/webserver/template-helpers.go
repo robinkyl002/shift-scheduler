@@ -11,10 +11,8 @@ func formatHour(hour int) string {
 	return fmt.Sprintf("%dpm", hour-12)
 }
 
-func sliceIndices(n int) []int {
-	values := make([]int, n)
-	for i := range values {
-		values[i] = i
-	}
-	return values
+func formatMinutes(totalMinutes int) string {
+	hours := totalMinutes / 60
+	minutes := totalMinutes % 60
+	return fmt.Sprintf("%dh %dm", hours, minutes)
 }

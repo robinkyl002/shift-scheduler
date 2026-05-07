@@ -4,38 +4,38 @@
         <form id="schedule-form" hx-post="/schedule" hx-swap="none">
             <input type="hidden" name="selected-slots" id="selected-slots">
 
-            <p><span id="weekly-total">Weekly Total: 0h 0m</span></p>
+            <p><span id="weekly-total">Weekly Total: {{formatMinutes .WeekView.WeeklyTotalMinutes}}</span></p>
 
             <table id="schedule-table">
                 <thead>
                     <tr>
                         <th scope="col"></th>
-                        {{range $hour := .Schedule.Hours}}
+                        {{range $hour := .WeekView.Hours}}
                             <th scope="col">{{ formatHour $hour}}</th>
                         {{end}}
                     </tr>
                 </thead>
                 <tbody>
-                    {{range $day := $.Schedule.Days}}
-                    <tr data-day="{{$day}}">
-                        <th scope="row">{{$day}}</th>
-                        {{range $hour := $.Schedule.Hours}}
-                            <td class="schedule-cell" data-day="{{$day}}" data-hour="{{$hour}}">
+                    {{range $row := $.WeekView.Rows}}
+                    <tr data-day="{{$row.Day}}">
+                        <th scope="row">{{$row.Day}}</th>
+                        {{range $cell := $row.Cells}}
+                            <td class="schedule-cell" data-day="{{$row.Day}}" data-hour="{{$cell.Hour}}">
                                 <div class="cell-slices">
-                                {{range sliceIndices $.Schedule.SlicesPerHour}}
+                                {{range $slice := $cell.Slices}}
                                 <button
                                     type="button"
-                                    class="slice"
-                                    data-day="{{$day}}"
-                                    data-hour="{{$hour}}"
-                                    data-slice="{{.}}">
+                                    class="slice{{if $slice.Selected}} selected{{end}}"
+                                    data-day="{{$row.Day}}"
+                                    data-hour="{{$cell.Hour}}"
+                                    data-slice="{{$slice.Index}}">
                                 </button>
                                 {{end}}
                                 </div>
                             </td>
                         {{end}}
                         <td class="day-total-cell">
-                            Daily Total: <span class="day-total">0h 0m</span>
+                            Daily Total: <span class="day-total">{{formatMinutes $row.TotalMinutes}}</span>
                         </td>
                     </tr>
                     {{end}}

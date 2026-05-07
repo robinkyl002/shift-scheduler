@@ -14,7 +14,6 @@ type TemplateData struct {
 	IsAuthenticated bool
 	Username        string
 	Role            string
-	Schedule        SchedulePageData
 
 	CurrentSubmission     *ScheduleSubmission
 	CurrentScheduleStatus ScheduleStatus

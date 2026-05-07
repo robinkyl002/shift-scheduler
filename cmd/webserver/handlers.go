@@ -138,8 +138,8 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	funcMap := template.FuncMap{
-		"formatHour":   formatHour,
-		"sliceIndices": sliceIndices,
+		"formatHour":    formatHour,
+		"formatMinutes": formatMinutes,
 	}
 
 	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
@@ -150,7 +150,32 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateData := buildTemplateData(r)
-	templateData.Schedule = buildSchedulePageData()
+
+	session, _, err := getSession(r)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	slots := []TimeSlot{}
+	readOnly := false
+
+	schedules, err := loadSchedules()
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	submission, found := findScheduleByUsername(schedules.Schedules, session.Username)
+
+	if found {
+		templateData.CurrentSubmission = submission
+		templateData.CurrentScheduleStatus = submission.Status
+		slots = submission.Slots
+	}
+
+	templateData.WeekView = buildWeekViewData(slots, readOnly)
 
 	if r.Header.Get("HX-Request") == "true" {
 		err = ts.ExecuteTemplate(w, "content", templateData)
