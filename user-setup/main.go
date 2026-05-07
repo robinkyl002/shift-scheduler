@@ -7,7 +7,9 @@ import (
 func main() {
 	users := make(map[string]User)
 	users["admin1"] = User{Username: "admin1", Password: "adminpass"}
+	users["admin2"] = User{Username: "admin2", Password: "stance"}
 	users["student1"] = User{Username: "student1", Password: "userpass"}
+	users["student2"] = User{Username: "student2", Password: "happen"}
 
 	for username, user := range users {
 		err := updateUserPassword("users.json", username, user.Password)
