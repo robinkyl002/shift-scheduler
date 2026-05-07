@@ -15,6 +15,20 @@ type TemplateData struct {
 	Username        string
 	Role            string
 	Schedule        SchedulePageData
+
+	CurrentSubmission     *ScheduleSubmission
+	CurrentScheduleStatus ScheduleStatus
+
+	PendingSchedules        []PendingScheduleSummary
+	SelectedPendingSchedule *ScheduleSubmission
+
+	WeekView WeekViewData
+}
+
+type PendingScheduleSummary struct {
+	Username    string
+	SubmittedAt string
+	Status      ScheduleStatus
 }
 
 type ScheduleStatus string
@@ -64,4 +78,27 @@ type ValidationResult struct {
 	Errors        []string
 	DailyMinutes  map[string]int
 	WeeklyMinutes int
+}
+
+type WeekViewData struct {
+	Hours              []int
+	Rows               []WeekViewRow
+	WeeklyTotalMinutes int
+	ReadOnly           bool
+}
+
+type WeekViewRow struct {
+	Day          string
+	Cells        []WeekViewCell
+	TotalMinutes int
+}
+
+type WeekViewCell struct {
+	Hour   int
+	Slices []WeekViewSlice
+}
+
+type WeekViewSlice struct {
+	Index    int
+	Selected bool
 }
