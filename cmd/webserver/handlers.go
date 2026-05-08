@@ -262,7 +262,6 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		templateData.WeekView = buildWeekViewData(existing.Slots, true)
 		templateData.ValidationErrors = []string{"This schedule can no longer be edited."}
 
-		// w.WriteHeader(http.StatusOK)
 		_ = ts.ExecuteTemplate(w, "content", templateData)
 		return
 	}
@@ -273,8 +272,6 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 
 	if len(valid.Errors) != 0 {
 		log.Print(valid.Errors)
-		// allErrors := strings.Join(valid.Errors, "\n")
-		// http.Error(w, allErrors, http.StatusBadRequest)
 
 		templateData := buildTemplateData(r)
 		templateData.ValidationErrors = valid.Errors
@@ -285,7 +282,6 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 			templateData.CurrentScheduleStatus = existing.Status
 		}
 
-		// w.WriteHeader(http.StatusOK)
 		err = ts.ExecuteTemplate(w, "content", templateData)
 		if err != nil {
 			log.Print(err.Error())
