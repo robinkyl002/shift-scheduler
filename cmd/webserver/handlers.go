@@ -387,7 +387,7 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		err = ts.ExecuteTemplate(w, "admin_review_detail", templateData)
+		err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
 	} else {
 		err = ts.ExecuteTemplate(w, "base", templateData)
 	}

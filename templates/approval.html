@@ -1,23 +1,28 @@
 {{define "content"}}
 <div id="approval-container">
     <h2>Schedule Approvals</h2>
-    <div class="pending-list">
-        {{if .PendingSchedules}}
-            {{range .PendingSchedules}}
-                <a 
-                    href="/admin?username={{.Username}}"
-                    hx-get="/admin?username={{.Username}}"
-                    hx-target="#review-detail"
-                    hx-swap="outerHTML"
-                    class="default-button {{if and $.SelectedPendingSchedule (eq $.SelectedPendingSchedule.Username .Username)}}selected{{end}}">{{.Username}}</a>
-            {{end}}
-        {{else}}
-            <p>No pending schedules to review.</p>
-        {{end}}
-    </div>
-    {{template "admin_review_detail" .}}
-
+    {{template "admin_review_panel" .}}
 </div>
+{{end}}
+
+{{define "admin_review_panel"}}
+    <div id="approval-review-panel">
+        <div class="pending-list">
+            {{if .PendingSchedules}}
+                {{range .PendingSchedules}}
+                    <a 
+                        href="/admin?username={{.Username}}"
+                        hx-get="/admin?username={{.Username}}"
+                        hx-target="#approval-review-panel"
+                        hx-swap="outerHTML"
+                        class="default-button {{if and $.SelectedPendingSchedule (eq $.SelectedPendingSchedule.Username .Username)}}selected{{end}}">{{.Username}}</a>
+                {{end}}
+            {{else}}
+                <p>No pending schedules to review.</p>
+            {{end}}
+        </div>
+        {{template "admin_review_detail" .}}
+    </div>
 {{end}}
 
 {{define "admin_review_detail"}}
