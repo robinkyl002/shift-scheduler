@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,16 +12,23 @@ import (
 	"time"
 )
 
-func TestSubmitScheduleTwiceForSameUserKeepsOneRecord(t *testing.T) {
+func TestRejectedScheduleResubmissionUpdatesExistingRecord(t *testing.T) {
 	originalWD, err := os.Getwd()
 	if err != nil {
 		t.Fatalf("get working directory: %v", err)
 	}
 
 	tempDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(`{"schedules":[]}`), 0644); err != nil {
+	firstPayload := buildSelectedSlotsJSON(t, "08", "12")
+	secondPayload := buildSelectedSlotsJSON(t, "09", "13")
+	firstScheduleSlots := marshalScheduleSlots(t, firstPayload)
+
+	initialSchedules := `{"schedules":[{"username":"student1","slots":` + firstScheduleSlots + `,"status":"rejected","rejection_comment":"Needs more weekday coverage","submitted_at":"2026-05-01T09:00:00Z","updated_at":"2026-05-01T09:00:00Z"}]}`
+
+	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(initialSchedules), 0644); err != nil {
 		t.Fatalf("seed schedules.json: %v", err)
 	}
+	seedScheduleTemplates(t, tempDir)
 
 	if err := os.Chdir(tempDir); err != nil {
 		t.Fatalf("change working directory: %v", err)
@@ -49,10 +57,6 @@ func TestSubmitScheduleTwiceForSameUserKeepsOneRecord(t *testing.T) {
 		sessionsMu.Unlock()
 	})
 
-	firstPayload := buildSelectedSlotsJSON(t, "08", "12")
-	secondPayload := buildSelectedSlotsJSON(t, "09", "13")
-
-	submitScheduleRequest(t, sessionID, firstPayload)
 	submitScheduleRequest(t, sessionID, secondPayload)
 
 	storedSchedules, err := loadSchedules()
@@ -75,6 +79,14 @@ func TestSubmitScheduleTwiceForSameUserKeepsOneRecord(t *testing.T) {
 
 	if stored.UpdatedAt == "" {
 		t.Fatal("expected UpdatedAt to be set")
+	}
+
+	if stored.Status != StatusPending {
+		t.Fatalf("expected resubmission to return to pending, got %s", stored.Status)
+	}
+
+	if stored.RejectionComment != "" {
+		t.Fatalf("expected rejection comment to be cleared, got %q", stored.RejectionComment)
 	}
 
 	if len(stored.Slots) != 120 {
@@ -139,5 +151,49 @@ func incrementHour(hour string) string {
 		return "13"
 	default:
 		return ""
+	}
+}
+
+func marshalScheduleSlots(t *testing.T, selectedSlots string) string {
+	t.Helper()
+
+	slots, err := parseSelectedSlots(selectedSlots)
+	if err != nil {
+		t.Fatalf("parse selected slots for seed data: %v", err)
+	}
+
+	encoded, err := json.Marshal(slots)
+	if err != nil {
+		t.Fatalf("marshal seeded schedule slots: %v", err)
+	}
+
+	return string(encoded)
+}
+
+func seedScheduleTemplates(t *testing.T, root string) {
+	t.Helper()
+
+	dirs := []string{
+		filepath.Join(root, "templates"),
+		filepath.Join(root, "components"),
+	}
+
+	for _, dir := range dirs {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			t.Fatalf("create test template dir %s: %v", dir, err)
+		}
+	}
+
+	files := map[string]string{
+		filepath.Join(root, "templates", "base.html"):       `{{define "base"}}{{end}}`,
+		filepath.Join(root, "components", "navbar.html"):    `{{define "nav"}}{{end}}`,
+		filepath.Join(root, "templates", "week_view.html"):  `{{define "week_view"}}<div>week view</div>{{end}}`,
+		filepath.Join(root, "templates", "schedule.html"):   `{{define "content"}}{{template "week_view" .}}{{end}}`,
+	}
+
+	for path, contents := range files {
+		if err := os.WriteFile(path, []byte(contents), 0644); err != nil {
+			t.Fatalf("seed template %s: %v", path, err)
+		}
 	}
 }

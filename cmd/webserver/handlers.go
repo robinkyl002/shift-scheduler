@@ -220,6 +220,11 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	var slots []TimeSlot
 	raw := r.FormValue("selected-slots")
@@ -250,6 +255,18 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		existing = &schedules.Schedules[existingIndex]
 	}
 
+	if existing != nil && (existing.Status == StatusPending || existing.Status == StatusApproved) {
+		templateData := buildTemplateData(r)
+		templateData.CurrentSubmission = existing
+		templateData.CurrentScheduleStatus = existing.Status
+		templateData.WeekView = buildWeekViewData(existing.Slots, true)
+		templateData.ValidationErrors = []string{"This schedule can no longer be edited."}
+
+		// w.WriteHeader(http.StatusOK)
+		_ = ts.ExecuteTemplate(w, "content", templateData)
+		return
+	}
+
 	scheduleSubmission := buildScheduleSubmission(user, slots, existing, time.Now())
 
 	valid := validateSchedule(scheduleSubmission)
@@ -260,7 +277,6 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		// http.Error(w, allErrors, http.StatusBadRequest)
 
 		templateData := buildTemplateData(r)
-		templateData.CurrentScheduleStatus = scheduleSubmission.Status
 		templateData.ValidationErrors = valid.Errors
 		templateData.WeekView = buildWeekViewData(slots, false)
 
@@ -269,8 +285,13 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 			templateData.CurrentScheduleStatus = existing.Status
 		}
 
-		w.WriteHeader(http.StatusBadRequest)
+		// w.WriteHeader(http.StatusOK)
 		err = ts.ExecuteTemplate(w, "content", templateData)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 
@@ -291,8 +312,11 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 	templateData.ValidationErrors = nil
 
 	err = ts.ExecuteTemplate(w, "content", templateData)
-	return
-
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func adminPage(w http.ResponseWriter, r *http.Request) {
