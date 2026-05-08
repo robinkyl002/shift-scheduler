@@ -27,6 +27,7 @@ type TemplateData struct {
 	AdminReviewErrors  []string
 	AdminReviewComment string
 	ShowRejectFields   bool
+	AdminReviewStatus  string
 }
 
 type PendingScheduleSummary struct {

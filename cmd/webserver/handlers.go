@@ -468,14 +468,95 @@ func submitScheduleReview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scheduleMu.Lock()
-	defer scheduleMu.Unlock()
+
 	schedules, err := loadSchedules()
 	if err != nil {
-		log.Print(err.Error())
+		scheduleMu.Unlock()
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	log.Print(schedules)
 
-	// schedule, found := findScheduleByUsername(schedules.Schedules, username)
+	schedule, found := findScheduleByUsername(schedules.Schedules, username)
+	if !found {
+		scheduleMu.Unlock()
+		templateData, err := buildAdminReviewTemplateData(r, username)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		templateData.AdminReviewErrors = []string{"That schedule could not be found."}
+		templateData.AdminReviewComment = comment
+		templateData.ShowRejectFields = (status == "rejected")
+
+		err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
+	if schedule.Status != StatusPending {
+		scheduleMu.Unlock()
+		templateData, err := buildAdminReviewTemplateData(r, username)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		templateData.AdminReviewErrors = []string{"That schedule is no longer pending review."}
+		templateData.AdminReviewComment = comment
+		templateData.ShowRejectFields = (status == "rejected")
+
+		err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		return
+
+	}
+
+	switch ScheduleStatus(status) {
+	case StatusApproved:
+		schedule.Status = StatusApproved
+		schedule.RejectionComment = ""
+	case StatusRejected:
+		schedule.Status = StatusRejected
+		schedule.RejectionComment = comment
+	}
+
+	schedule.UpdatedAt = time.Now().String()
+
+	err = saveSchedules(schedules)
+	scheduleMu.Unlock()
+
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	templateData, err := buildAdminReviewTemplateData(r, username)
+	switch schedule.Status {
+	case StatusApproved:
+		templateData.AdminReviewStatus = "Schedule approved."
+	case StatusRejected:
+		templateData.AdminReviewStatus = "Schedule rejected."
+	}
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 }

@@ -17,11 +17,13 @@
                         hx-swap="outerHTML"
                         class="default-button {{if and $.SelectedPendingSchedule (eq $.SelectedPendingSchedule.Username .Username)}}selected{{end}}">{{.Username}}</a>
                 {{end}}
-            {{else}}
-                <p>No pending schedules to review.</p>
             {{end}}
         </div>
-        <div id="submit-status"></div>
+        {{if .AdminReviewStatus}}
+            <div id="submit-status">{{.AdminReviewStatus}}</div>
+        {{else}}
+            <div id="submit-status"></div>
+        {{end}}
         {{template "admin_review_detail" .}}
     </div>
 {{end}}
