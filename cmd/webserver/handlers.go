@@ -161,6 +161,7 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	editMode := r.URL.Query().Get("edit") == "true"
 	slots := []TimeSlot{}
 	readOnly := false
 
@@ -177,9 +178,14 @@ func getIndividualSchedule(w http.ResponseWriter, r *http.Request) {
 		templateData.CurrentScheduleStatus = submission.Status
 		slots = submission.Slots
 		switch submission.Status {
-		case StatusApproved, StatusPending:
+		case StatusPending:
 			readOnly = true
+			templateData.CanEditCurrentSchedule = false
+		case StatusApproved, StatusRejected:
+			templateData.CanEditCurrentSchedule = true
+			readOnly = !editMode
 		default:
+			templateData.CanEditCurrentSchedule = true
 			readOnly = false
 		}
 	}
@@ -258,7 +264,7 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 		existing = &schedules.Schedules[existingIndex]
 	}
 
-	if existing != nil && (existing.Status == StatusPending || existing.Status == StatusApproved) {
+	if existing != nil && (existing.Status == StatusPending) {
 		templateData := buildTemplateData(r)
 		templateData.CurrentSubmission = existing
 		templateData.CurrentScheduleStatus = existing.Status

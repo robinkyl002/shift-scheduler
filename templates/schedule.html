@@ -25,16 +25,41 @@
         {{if .WeekView.ReadOnly}}
 
             {{template "week_view" .}}
+            {{if .CanEditCurrentSchedule}}
+                <button
+                    type="button"
+                    class="default-button"
+                    hx-get="/schedule?edit=true"
+                    hx-target="#schedule-container"
+                    hx-swap="outerHTML">
+                    Edit Schedule
+                </button>
+            {{end}}
 
         {{else}}
             <form id="schedule-form" hx-post="/schedule" hx-target="#schedule-container" hx-swap="outerHTML">
                 <input type="hidden" name="selected-slots" id="selected-slots">
 
                 {{template "week_view" .}}
+                
+            {{if .CurrentSubmission}}
+                <button
+                    type="button"
+                    class="default-button"
+                    hx-get="/schedule"
+                    hx-target="#schedule-container"
+                    hx-swap="outerHTML">
+                    Cancel
+                </button>
 
+                <button type="submit" class="default-button">
+                    Resubmit for Approval
+                </button>
+            {{else}}
                 <button type="submit" class="default-button">
                     Submit Schedule
                 </button>
+            {{end}}
             </form>
         {{end}}
     </div>

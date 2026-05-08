@@ -15,6 +15,8 @@ type TemplateData struct {
 	Username        string
 	Role            string
 
+	CanEditCurrentSchedule bool
+
 	CurrentSubmission     *ScheduleSubmission
 	CurrentScheduleStatus ScheduleStatus
 	ValidationErrors      []string

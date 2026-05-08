@@ -274,6 +274,151 @@
           "slice": 5
         },
         {
+          "day": "Tue",
+          "hour": 8,
+          "slice": 1
+        },
+        {
+          "day": "Tue",
+          "hour": 8,
+          "slice": 2
+        },
+        {
+          "day": "Tue",
+          "hour": 8,
+          "slice": 3
+        },
+        {
+          "day": "Tue",
+          "hour": 8,
+          "slice": 4
+        },
+        {
+          "day": "Tue",
+          "hour": 8,
+          "slice": 5
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 0
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 1
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 2
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 3
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 4
+        },
+        {
+          "day": "Tue",
+          "hour": 9,
+          "slice": 5
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 0
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 1
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 2
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 3
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 4
+        },
+        {
+          "day": "Tue",
+          "hour": 10,
+          "slice": 5
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 0
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 1
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 2
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 3
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 4
+        },
+        {
+          "day": "Tue",
+          "hour": 11,
+          "slice": 5
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 0
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 1
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 2
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 3
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 4
+        },
+        {
+          "day": "Tue",
+          "hour": 12,
+          "slice": 5
+        },
+        {
           "day": "Wed",
           "hour": 8,
           "slice": 0
@@ -814,9 +959,9 @@
           "slice": 5
         }
       ],
-      "status": "approved",
+      "status": "pending",
       "submitted_at": "2026-05-07 11:16:14.5933684 -0600 MDT m=+51.345891301",
-      "updated_at": "2026-05-08 14:24:18.8806691 -0600 MDT m=+74.917154601"
+      "updated_at": "2026-05-08 15:23:27.5406994 -0600 MDT m=+363.394368301"
     },
     {
       "username": "student2",

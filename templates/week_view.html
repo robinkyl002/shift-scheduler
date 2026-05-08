@@ -24,6 +24,7 @@
                         <button
                             type="button"
                             class="slice{{if $slice.Selected}} selected{{end}}"
+                            aria-pressed="{{if $slice.Selected}}true{{else}}false{{end}}"
                             data-day="{{$row.Day}}"
                             data-hour="{{$cell.Hour}}"
                             data-slice="{{$slice.Index}}">
