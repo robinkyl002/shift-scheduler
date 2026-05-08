@@ -189,6 +189,7 @@ func seedScheduleTemplates(t *testing.T, root string) {
 		filepath.Join(root, "components", "navbar.html"):    `{{define "nav"}}{{end}}`,
 		filepath.Join(root, "templates", "week_view.html"):  `{{define "week_view"}}<div>week view</div>{{end}}`,
 		filepath.Join(root, "templates", "schedule.html"):   `{{define "content"}}{{template "week_view" .}}{{end}}`,
+		filepath.Join(root, "templates", "approval.html"):   `{{define "content"}}<div id="approval-container">{{template "admin_review_detail" .}}</div>{{end}}{{define "admin_review_detail"}}<div id="review-detail">{{if .SelectedPendingSchedule}}{{.SelectedPendingSchedule.Username}}{{else}}No pending schedules to review.{{end}}</div>{{end}}`,
 	}
 
 	for path, contents := range files {

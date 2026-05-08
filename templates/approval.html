@@ -1,7 +1,36 @@
 {{define "content"}}
 <div id="approval-container">
     <h2>Page for approvals</h2>
-    {{template "week_view" .}}
-    {{.PendingSchedules}}
+    <div class="pending-list">
+        {{if .PendingSchedules}}
+            {{range .PendingSchedules}}
+                <a 
+                    href="/admin?username={{.Username}}"
+                    hx-get="/admin?username={{.Username}}"
+                    hx-target="#review-detail"
+                    hx-swap="outerHTML"
+                    class="default-button {{if and $.SelectedPendingSchedule (eq $.SelectedPendingSchedule.Username .Username)}}selected{{end}}">{{.Username}}</a>
+            {{end}}
+        {{else}}
+            <p>No pending schedules to review.</p>
+        {{end}}
+    </div>
+    {{template "admin_review_detail" .}}
+
 </div>
+{{end}}
+
+{{define "admin_review_detail"}}
+    <div id="review-detail" class="review-detail">
+        {{if .SelectedPendingSchedule}}
+            <h3>{{.SelectedPendingSchedule.Username}}</h3>
+            <div class="review-actions">
+                <button type="button" class="default-button">Approve</button>
+                <button type="button" class="default-button">Reject</button>
+            </div>
+            {{template "week_view" .}}
+        {{else}}
+            <p>No pending schedules to review.</p>
+        {{end}}
+    </div>
 {{end}}

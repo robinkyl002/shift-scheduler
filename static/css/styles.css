@@ -92,11 +92,8 @@ nav ul li a {
 
 #schedule-table th, #schedule-table td {
     border: 2px solid slategray;
-    /* padding: 10px; */
     text-align: center;
-    /* padding: 1rem 1.5rem; */
     min-width: 70px;
-    /* height: 60px; */
 }
 
 #schedule-container {
@@ -127,7 +124,6 @@ nav ul li a {
     min-width: 5px;
     margin: 0;
     padding: 0;
-    /* width: 2px; */
 }
 
 .slice.selected {
@@ -141,5 +137,10 @@ nav ul li a {
 #approval-container {
     width: 85vw;
     margin: 0 auto;
-    justify-content: center;
+}
+
+.pending-list a.selected {
+    background-color: white;
+    color: #002e5d;
+    border: 2px solid #001f3f;
 }

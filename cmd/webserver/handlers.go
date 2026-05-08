@@ -365,15 +365,29 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 
 	templateData.PendingSchedules = scheduleSummaries
 
-	if len(pendingSchedules) > 0 {
-		templateData.SelectedPendingSchedule = &pendingSchedules[0]
-		templateData.WeekView = buildWeekViewData(pendingSchedules[0].Slots, true)
-	} else {
-		templateData.WeekView = buildWeekViewData([]TimeSlot{}, true)
+	selectedUsername := r.URL.Query().Get("username")
+	var selected *ScheduleSubmission
+
+	if selectedUsername != "" {
+		for i := range pendingSchedules {
+			if pendingSchedules[i].Username == selectedUsername {
+				selected = &pendingSchedules[i]
+				break
+			}
+		}
+	}
+
+	if selected == nil && len(pendingSchedules) > 0 {
+		selected = &pendingSchedules[0]
+	}
+
+	templateData.SelectedPendingSchedule = selected
+	if selected != nil {
+		templateData.WeekView = buildWeekViewData(selected.Slots, true)
 	}
 
 	if r.Header.Get("HX-Request") == "true" {
-		err = ts.ExecuteTemplate(w, "content", templateData)
+		err = ts.ExecuteTemplate(w, "admin_review_detail", templateData)
 	} else {
 		err = ts.ExecuteTemplate(w, "base", templateData)
 	}
