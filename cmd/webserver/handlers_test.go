@@ -99,6 +99,167 @@ func TestRejectedScheduleResubmissionUpdatesExistingRecord(t *testing.T) {
 	}
 }
 
+func TestAdminPageShowsOnlyPendingSchedulesAndSelectsFirstByDefault(t *testing.T) {
+	originalWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory: %v", err)
+	}
+
+	tempDir := t.TempDir()
+	morningSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "08", "12"))
+	afternoonSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "09", "13"))
+
+	initialSchedules := `{"schedules":[` +
+		`{"username":"student1","slots":` + morningSlots + `,"status":"pending","submitted_at":"2026-05-01T09:00:00Z","updated_at":"2026-05-01T09:00:00Z"},` +
+		`{"username":"student2","slots":` + afternoonSlots + `,"status":"pending","submitted_at":"2026-05-02T09:00:00Z","updated_at":"2026-05-02T09:00:00Z"},` +
+		`{"username":"student3","slots":` + morningSlots + `,"status":"approved","submitted_at":"2026-05-03T09:00:00Z","updated_at":"2026-05-03T09:00:00Z"},` +
+		`{"username":"student4","slots":` + afternoonSlots + `,"status":"rejected","submitted_at":"2026-05-04T09:00:00Z","updated_at":"2026-05-04T09:00:00Z"}` +
+		`]}`
+
+	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(initialSchedules), 0644); err != nil {
+		t.Fatalf("seed schedules.json: %v", err)
+	}
+	seedScheduleTemplates(t, tempDir)
+
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("change working directory: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(originalWD)
+	})
+
+	recorder := adminPageRequest(t, "/admin", false)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `pending-user="student1"`) {
+		t.Fatalf("expected first pending user in list, got body %q", body)
+	}
+
+	if !strings.Contains(body, `pending-user="student2"`) {
+		t.Fatalf("expected second pending user in list, got body %q", body)
+	}
+
+	if strings.Contains(body, `pending-user="student3"`) || strings.Contains(body, `pending-user="student4"`) {
+		t.Fatalf("expected only pending users in list, got body %q", body)
+	}
+
+	if !strings.Contains(body, `selected: student1`) {
+		t.Fatalf("expected first pending schedule to be selected by default, got body %q", body)
+	}
+}
+
+func TestAdminPageSelectedScheduleRendersReadOnly(t *testing.T) {
+	originalWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory: %v", err)
+	}
+
+	tempDir := t.TempDir()
+	morningSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "08", "12"))
+	afternoonSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "09", "13"))
+
+	initialSchedules := `{"schedules":[` +
+		`{"username":"student1","slots":` + morningSlots + `,"status":"pending","submitted_at":"2026-05-01T09:00:00Z","updated_at":"2026-05-01T09:00:00Z"},` +
+		`{"username":"student2","slots":` + afternoonSlots + `,"status":"pending","submitted_at":"2026-05-02T09:00:00Z","updated_at":"2026-05-02T09:00:00Z"}` +
+		`]}`
+
+	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(initialSchedules), 0644); err != nil {
+		t.Fatalf("seed schedules.json: %v", err)
+	}
+	seedScheduleTemplates(t, tempDir)
+
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("change working directory: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(originalWD)
+	})
+
+	recorder := adminPageRequest(t, "/admin?username=student2", false)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `selected: student2`) {
+		t.Fatalf("expected selected pending schedule details for student2, got body %q", body)
+	}
+
+	if !strings.Contains(body, `readOnly=true`) {
+		t.Fatalf("expected admin week view to render in read-only mode, got body %q", body)
+	}
+}
+
+func TestAdminPageShowsEmptyStateWhenNoPendingSchedulesExist(t *testing.T) {
+	originalWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory: %v", err)
+	}
+
+	tempDir := t.TempDir()
+	morningSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "08", "12"))
+
+	initialSchedules := `{"schedules":[` +
+		`{"username":"student3","slots":` + morningSlots + `,"status":"approved","submitted_at":"2026-05-03T09:00:00Z","updated_at":"2026-05-03T09:00:00Z"},` +
+		`{"username":"student4","slots":` + morningSlots + `,"status":"rejected","submitted_at":"2026-05-04T09:00:00Z","updated_at":"2026-05-04T09:00:00Z"}` +
+		`]}`
+
+	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(initialSchedules), 0644); err != nil {
+		t.Fatalf("seed schedules.json: %v", err)
+	}
+	seedScheduleTemplates(t, tempDir)
+
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("change working directory: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(originalWD)
+	})
+
+	recorder := adminPageRequest(t, "/admin", false)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `No pending schedules to review.`) {
+		t.Fatalf("expected empty state when no pending schedules exist, got body %q", body)
+	}
+}
+
+func TestAdminPageHTMXReturnsOnlyDetailFragment(t *testing.T) {
+	originalWD, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("get working directory: %v", err)
+	}
+
+	tempDir := t.TempDir()
+	morningSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "08", "12"))
+	afternoonSlots := marshalScheduleSlots(t, buildSelectedSlotsJSON(t, "09", "13"))
+
+	initialSchedules := `{"schedules":[` +
+		`{"username":"student1","slots":` + morningSlots + `,"status":"pending","submitted_at":"2026-05-01T09:00:00Z","updated_at":"2026-05-01T09:00:00Z"},` +
+		`{"username":"student2","slots":` + afternoonSlots + `,"status":"pending","submitted_at":"2026-05-02T09:00:00Z","updated_at":"2026-05-02T09:00:00Z"}` +
+		`]}`
+
+	if err := os.WriteFile(filepath.Join(tempDir, "schedules.json"), []byte(initialSchedules), 0644); err != nil {
+		t.Fatalf("seed schedules.json: %v", err)
+	}
+	seedScheduleTemplates(t, tempDir)
+
+	if err := os.Chdir(tempDir); err != nil {
+		t.Fatalf("change working directory: %v", err)
+	}
+	t.Cleanup(func() {
+		_ = os.Chdir(originalWD)
+	})
+
+	recorder := adminPageRequest(t, "/admin?username=student2", true)
+	body := recorder.Body.String()
+
+	if !strings.Contains(body, `id="review-detail"`) {
+		t.Fatalf("expected HTMX response to include detail fragment, got body %q", body)
+	}
+
+	if strings.Contains(body, `id="approval-container"`) {
+		t.Fatalf("expected HTMX response to exclude full page shell, got body %q", body)
+	}
+}
+
 func submitScheduleRequest(t *testing.T, sessionID, selectedSlots string) {
 	t.Helper()
 
@@ -118,6 +279,24 @@ func submitScheduleRequest(t *testing.T, sessionID, selectedSlots string) {
 	if recorder.Code != http.StatusOK {
 		t.Fatalf("expected status 200, got %d with body %q", recorder.Code, recorder.Body.String())
 	}
+}
+
+func adminPageRequest(t *testing.T, path string, htmx bool) *httptest.ResponseRecorder {
+	t.Helper()
+
+	req := httptest.NewRequest(http.MethodGet, path, nil)
+	if htmx {
+		req.Header.Set("HX-Request", "true")
+	}
+
+	recorder := httptest.NewRecorder()
+	adminPage(recorder, req)
+
+	if recorder.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d with body %q", recorder.Code, recorder.Body.String())
+	}
+
+	return recorder
 }
 
 func buildSelectedSlotsJSON(t *testing.T, startHour, endHour string) string {
@@ -185,11 +364,11 @@ func seedScheduleTemplates(t *testing.T, root string) {
 	}
 
 	files := map[string]string{
-		filepath.Join(root, "templates", "base.html"):       `{{define "base"}}{{end}}`,
+		filepath.Join(root, "templates", "base.html"):       `{{define "base"}}{{template "content" .}}{{end}}`,
 		filepath.Join(root, "components", "navbar.html"):    `{{define "nav"}}{{end}}`,
-		filepath.Join(root, "templates", "week_view.html"):  `{{define "week_view"}}<div>week view</div>{{end}}`,
+		filepath.Join(root, "templates", "week_view.html"):  `{{define "week_view"}}<div>readOnly={{.WeekView.ReadOnly}} total={{.WeekView.WeeklyTotalMinutes}}</div>{{end}}`,
 		filepath.Join(root, "templates", "schedule.html"):   `{{define "content"}}{{template "week_view" .}}{{end}}`,
-		filepath.Join(root, "templates", "approval.html"):   `{{define "content"}}<div id="approval-container">{{template "admin_review_detail" .}}</div>{{end}}{{define "admin_review_detail"}}<div id="review-detail">{{if .SelectedPendingSchedule}}{{.SelectedPendingSchedule.Username}}{{else}}No pending schedules to review.{{end}}</div>{{end}}`,
+		filepath.Join(root, "templates", "approval.html"):   `{{define "content"}}<div id="approval-container">{{if .PendingSchedules}}{{range .PendingSchedules}}<span pending-user="{{.Username}}">{{.Username}}</span>{{end}}{{end}}{{template "admin_review_detail" .}}</div>{{end}}{{define "admin_review_detail"}}<div id="review-detail">{{if .SelectedPendingSchedule}}selected: {{.SelectedPendingSchedule.Username}} {{template "week_view" .}}{{else}}No pending schedules to review.{{end}}</div>{{end}}`,
 	}
 
 	for path, contents := range files {

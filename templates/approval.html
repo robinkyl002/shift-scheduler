@@ -1,6 +1,6 @@
 {{define "content"}}
 <div id="approval-container">
-    <h2>Page for approvals</h2>
+    <h2>Schedule Approvals</h2>
     <div class="pending-list">
         {{if .PendingSchedules}}
             {{range .PendingSchedules}}
@@ -25,8 +25,8 @@
         {{if .SelectedPendingSchedule}}
             <h3>{{.SelectedPendingSchedule.Username}}</h3>
             <div class="review-actions">
-                <button type="button" class="default-button">Approve</button>
-                <button type="button" class="default-button">Reject</button>
+                <button type="button" class="default-button" style="background-color: #006141;">Approve</button>
+                <button type="button" class="default-button" style="background-color: #A3082A;">Reject</button>
             </div>
             {{template "week_view" .}}
         {{else}}
