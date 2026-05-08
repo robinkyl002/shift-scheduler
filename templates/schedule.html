@@ -16,7 +16,11 @@
             <div id="save-status">Status: Rejected</div>
         {{end}}
         {{if eq .CurrentScheduleStatus "rejected"}}
+            {{if .CurrentSubmission.RejectionComment}}
             <div id="rejection-comment">Reason: {{.CurrentSubmission.RejectionComment}}</div>
+            {{else}}
+            <div id="rejection-comment">Reason: No comment provided</div>
+            {{end}}
         {{end}}
         {{if .WeekView.ReadOnly}}
 

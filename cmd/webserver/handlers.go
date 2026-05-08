@@ -416,14 +416,10 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	log.Print("Successfully built the page")
 }
 
-func invalidReviewFields(username string, status string, comment string) []string {
+func invalidReviewFields(username string, status string) []string {
 	errors := make([]string, 0)
 	if status != "approved" && status != "rejected" {
 		errors = append(errors, "Status must be approved or rejected")
-	}
-
-	if status == "rejected" && comment == "" {
-		errors = append(errors, "A rejection comment is required.")
 	}
 
 	if username == "" {
@@ -445,7 +441,7 @@ func submitScheduleReview(w http.ResponseWriter, r *http.Request) {
 	status := r.FormValue("status")
 	comment := strings.TrimSpace(r.FormValue("rejection_comment"))
 
-	reviewErrors := invalidReviewFields(username, status, comment)
+	reviewErrors := invalidReviewFields(username, status)
 	if len(reviewErrors) > 0 {
 		templateData, err := buildAdminReviewTemplateData(r, username)
 		if err != nil {
