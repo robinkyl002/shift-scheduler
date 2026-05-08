@@ -137,3 +137,9 @@ nav ul li a {
 #schedule-container, #schedule-table, .slice {
     user-select: none;
 }
+
+#approval-container {
+    width: 85vw;
+    margin: 0 auto;
+    justify-content: center;
+}

@@ -338,7 +338,39 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	log.Print("Files parsed, building template data and trying to build template")
 
 	templateData := buildTemplateData(r)
-	templateData.WeekView = buildWeekViewData([]TimeSlot{}, true)
+
+	schedules, err := loadSchedules()
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	pendingSchedules := make([]ScheduleSubmission, 0)
+
+	for _, schedule := range schedules.Schedules {
+		if schedule.Status == StatusPending {
+			pendingSchedules = append(pendingSchedules, schedule)
+		}
+	}
+
+	scheduleSummaries := make([]PendingScheduleSummary, 0)
+	for _, schedule := range pendingSchedules {
+		scheduleSummaries = append(scheduleSummaries, PendingScheduleSummary{
+			Username:    schedule.Username,
+			SubmittedAt: schedule.SubmittedAt,
+			Status:      schedule.Status,
+		})
+	}
+
+	templateData.PendingSchedules = scheduleSummaries
+
+	if len(pendingSchedules) > 0 {
+		templateData.SelectedPendingSchedule = &pendingSchedules[0]
+		templateData.WeekView = buildWeekViewData(pendingSchedules[0].Slots, true)
+	} else {
+		templateData.WeekView = buildWeekViewData([]TimeSlot{}, true)
+	}
 
 	if r.Header.Get("HX-Request") == "true" {
 		err = ts.ExecuteTemplate(w, "content", templateData)
