@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -21,6 +22,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -28,6 +30,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 	err = ts.ExecuteTemplate(w, "base", templateData)
 	if err != nil {
 		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -315,35 +318,12 @@ func submitSchedule(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func adminPage(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./templates/approval.html",
-		"./templates/base.html",
-		"./components/navbar.html",
-		"./templates/week_view.html",
-	}
-
-	log.Print("Attempting to parse files")
-
-	funcMap := template.FuncMap{
-		"formatHour":    formatHour,
-		"formatMinutes": formatMinutes,
-	}
-
-	ts, err := template.New("base").Funcs(funcMap).ParseFiles(files...)
-	if err != nil {
-		log.Print(err.Error())
-		return
-	}
-	log.Print("Files parsed, building template data and trying to build template")
-
+func buildAdminReviewTemplateData(r *http.Request, selectedUsername string) (TemplateData, error) {
 	templateData := buildTemplateData(r)
 
 	schedules, err := loadSchedules()
 	if err != nil {
-		log.Print(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
+		return TemplateData{}, err
 	}
 
 	pendingSchedules := make([]ScheduleSubmission, 0)
@@ -364,8 +344,6 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templateData.PendingSchedules = scheduleSummaries
-
-	selectedUsername := r.URL.Query().Get("username")
 	var selected *ScheduleSubmission
 
 	if selectedUsername != "" {
@@ -386,6 +364,43 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 		templateData.WeekView = buildWeekViewData(selected.Slots, true)
 	}
 
+	return templateData, nil
+}
+
+func parseAdminTemplates() (*template.Template, error) {
+	files := []string{
+		"./templates/approval.html",
+		"./templates/base.html",
+		"./components/navbar.html",
+		"./templates/week_view.html",
+	}
+
+	log.Print("Attempting to parse files")
+
+	funcMap := template.FuncMap{
+		"formatHour":    formatHour,
+		"formatMinutes": formatMinutes,
+	}
+
+	return template.New("base").Funcs(funcMap).ParseFiles(files...)
+}
+
+func adminPage(w http.ResponseWriter, r *http.Request) {
+	ts, err := parseAdminTemplates()
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	log.Print("Files parsed, building template data and trying to build template")
+
+	templateData, err := buildAdminReviewTemplateData(r, r.URL.Query().Get("username"))
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	if r.Header.Get("HX-Request") == "true" {
 		err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
 	} else {
@@ -399,4 +414,68 @@ func adminPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Print("Successfully built the page")
+}
+
+func invalidReviewFields(username string, status string, comment string) []string {
+	errors := make([]string, 0)
+	if status != "approved" && status != "rejected" {
+		errors = append(errors, "Status must be approved or rejected")
+	}
+
+	if status == "rejected" && comment == "" {
+		errors = append(errors, "A rejection comment is required.")
+	}
+
+	if username == "" {
+		errors = append(errors, "Username may not be empty")
+	}
+
+	return errors
+}
+
+func submitScheduleReview(w http.ResponseWriter, r *http.Request) {
+	ts, err := parseAdminTemplates()
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	username := r.FormValue("username")
+	status := r.FormValue("status")
+	comment := strings.TrimSpace(r.FormValue("rejection_comment"))
+
+	reviewErrors := invalidReviewFields(username, status, comment)
+	if len(reviewErrors) > 0 {
+		templateData, err := buildAdminReviewTemplateData(r, username)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		templateData.AdminReviewErrors = reviewErrors
+		templateData.AdminReviewComment = comment
+		templateData.ShowRejectFields = true
+
+		err = ts.ExecuteTemplate(w, "admin_review_panel", templateData)
+		if err != nil {
+			log.Print(err.Error())
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		return
+
+	}
+
+	scheduleMu.Lock()
+	defer scheduleMu.Unlock()
+	schedules, err := loadSchedules()
+	if err != nil {
+		log.Print(err.Error())
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	log.Print(schedules)
+
+	// schedule, found := findScheduleByUsername(schedules.Schedules, username)
 }

@@ -17,6 +17,7 @@ func main() {
 	mux.HandleFunc("POST /schedule", requireAuth(submitSchedule))
 
 	mux.HandleFunc("GET /admin", requireAuth(requireRole("Admin", adminPage)))
+	mux.HandleFunc("POST /admin/review", requireAuth(requireRole("Admin", submitScheduleReview)))
 
 	fs := http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))

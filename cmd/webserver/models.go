@@ -23,6 +23,10 @@ type TemplateData struct {
 	SelectedPendingSchedule *ScheduleSubmission
 
 	WeekView WeekViewData
+
+	AdminReviewErrors  []string
+	AdminReviewComment string
+	ShowRejectFields   bool
 }
 
 type PendingScheduleSummary struct {

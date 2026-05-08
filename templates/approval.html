@@ -21,21 +21,61 @@
                 <p>No pending schedules to review.</p>
             {{end}}
         </div>
+        <div id="submit-status"></div>
         {{template "admin_review_detail" .}}
     </div>
 {{end}}
 
 {{define "admin_review_detail"}}
-    <div id="review-detail" class="review-detail">
-        {{if .SelectedPendingSchedule}}
+    {{if .SelectedPendingSchedule}}
+        <form id="review-detail" class="review-detail" hx-post="/admin/review" hx-target="#approval-review-panel" hx-swap="outerHTML">
             <h3>{{.SelectedPendingSchedule.Username}}</h3>
-            <div class="review-actions">
-                <button type="button" class="default-button" style="background-color: #006141;">Approve</button>
-                <button type="button" class="default-button" style="background-color: #A3082A;">Reject</button>
+            <input type="hidden" name="username" id="selected-username" value="{{.SelectedPendingSchedule.Username}}">
+            
+            {{if .AdminReviewErrors}}
+                <div class="review-errors">
+                    {{range .AdminReviewErrors}}
+                        <p>{{.}}</p>
+                    {{end}}
+                </div>
+            {{end}}
+
+            <div class="review-actions">   
+                <button type="submit" class="default-button" style="background-color: #006141;"
+                    name="status" value="approved">
+                    Approve
+                </button>
+                <button type="button" class="default-button" style="background-color: #A3082A;"
+                    name="status" value="rejected"
+                    onclick="document.getElementById('reject-fields').hidden = false; 
+                    document.getElementById('rejection-comment').focus();">
+                    Reject
+                </button>
             </div>
+
+            <div id="reject-fields" {{if not .ShowRejectFields}}hidden{{end}}>
+                <label for="rejection-comment">Rejection comment</label>
+                <textarea
+                    id="rejection-comment"
+                    name="rejection_comment"
+                    rows="4"
+                    placeholder="Explain what the user should revise...">{{.AdminReviewComment}}</textarea>
+
+                <button
+                    type="submit"
+                    class="default-button"
+                    style="background-color: #A3082A;"
+                    name="status"
+                    value="rejected">
+                    Confirm Reject
+                </button>
+            </div>
+
             {{template "week_view" .}}
+        </form>
         {{else}}
-            <p>No pending schedules to review.</p>
+            <div id="review-detail" class="review-detail">
+                <p>No pending schedules to review.</p>
+            </div>
         {{end}}
-    </div>
 {{end}}
