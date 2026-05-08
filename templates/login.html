@@ -1,8 +1,8 @@
 {{define "content"}}
     <div id="login-container">
         <h2>Login</h2>
-        <form id="login-form" hx-post="/login" hx-swap="none">
-            <div login-errors></div>
+        <form id="login-form" hx-post="/login" hx-target="#login-errors" hx-swap="outerHTML">
+            {{template "login_errors" .}}
             <div>
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
@@ -13,5 +13,13 @@
             </div>
             <button type="submit" class="default-button">Sign In</button>
         </form>
+    </div>
+{{end}}
+
+{{define "login_errors"}}
+    <div id="login-errors" login-errors>
+        {{range .LoginErrors}}
+            <p style="color: #A3082A">{{.}}</p>
+        {{end}}
     </div>
 {{end}}

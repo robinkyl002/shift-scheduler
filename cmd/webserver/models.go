@@ -14,6 +14,7 @@ type TemplateData struct {
 	IsAuthenticated bool
 	Username        string
 	Role            string
+	LoginErrors     []string
 
 	CanEditCurrentSchedule bool
 

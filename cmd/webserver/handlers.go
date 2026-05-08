@@ -95,7 +95,28 @@ func login(w http.ResponseWriter, r *http.Request) {
 			err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 			if err != nil {
 				log.Printf("Failed login attempt for user %s: %v", user.Username, err)
-				http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+				templateData := buildTemplateData(r)
+				templateData.LoginErrors = []string{"Invalid username or password"}
+
+				ts, err := template.ParseFiles(
+					"./templates/base.html",
+					"./components/navbar.html",
+					"./templates/login.html",
+				)
+				if err != nil {
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+					return
+				}
+
+				if r.Header.Get("HX-Request") == "true" {
+					err = ts.ExecuteTemplate(w, "login_errors", templateData)
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+					err = ts.ExecuteTemplate(w, "base", templateData)
+				}
+				if err != nil {
+					http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				}
 				return
 			}
 
@@ -119,7 +140,28 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("User %s does not exist", username)
-	http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+	templateData := buildTemplateData(r)
+	templateData.LoginErrors = []string{"Invalid username or password"}
+
+	ts, err := template.ParseFiles(
+		"./templates/base.html",
+		"./components/navbar.html",
+		"./templates/login.html",
+	)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		err = ts.ExecuteTemplate(w, "login_errors", templateData)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		err = ts.ExecuteTemplate(w, "base", templateData)
+	}
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
