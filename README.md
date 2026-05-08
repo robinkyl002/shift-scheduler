@@ -27,7 +27,7 @@ You will be automatically redirected to the schedule page where you can submit a
 
 There are two admin users already populated in users.json, admin1 and admin2. 
 
-The set password for student1 is userpass. The password for student2 is happen.
+The set password for admin1 is adminpass. The password for admin2 is stance.
 
 Login as one of the admins. 
 
